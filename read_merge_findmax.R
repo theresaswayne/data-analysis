@@ -6,16 +6,17 @@
 #  -- for each image, finds the row with the maximum mean fluorescence and writes that to a new data frame
 #  -- saves the maxima to a file
 
-inputFolder <- "~/Desktop/R projects/input/"      # path to folder that holds multiple .csv files
-outputFolder <- "~/Desktop/R projects/output/"
-
-# read files
-# from http://serialmentor.com/blog/2016/6/13/reading-and-combining-many-tidy-data-files-in-R
-
 library(purrr) # for reduce and map functions
 library(readr) # for read_csv
 library(dplyr) # for mutate, data_frame
 library(tidyr) # for unnest
+
+inputFolder <- "./input/"      # path to folder that holds multiple .csv files
+outputFolder <- "./output/"
+
+# read files
+# from http://serialmentor.com/blog/2016/6/13/reading-and-combining-many-tidy-data-files-in-R
+
 
 files <- dir(inputFolder, pattern = "*.csv") # get file names
 
