@@ -5,6 +5,7 @@
 # Input: CSV file from SGD with human-readable headers
 # Must include Protein systematic name, 
 # and all possible fields under protein domains.
+# assumes that the protein contains some domains
 
 # Output:
 # 1. Frequency distribution table and histogram of domains per protein
@@ -21,4 +22,9 @@
 
 # 2. Group by protein name
 
-# Summarize(?) getting count 
+# 3. Summarize(?) getting count of rows for each protein name 
+# because each row is 1 domain
+
+# 4. Write data table of protein, # domains, sorted by # domains
+
+# 5. Create histogram of domains per protein
