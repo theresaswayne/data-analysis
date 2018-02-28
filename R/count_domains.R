@@ -5,7 +5,7 @@
 # Input: CSV file from SGD with human-readable headers
 # Must include Protein systematic name, 
 # and all possible fields under protein domains.
-# assumes that the protein contains some domains
+# Assumes that the protein contains some domains.
 
 # Output:
 # 1. Frequency distribution table and histogram of domains per protein
@@ -15,16 +15,45 @@
 # -- eliminate redundant domains using start and end residues
 # -- filter by domains that are involved in protein-protein interactions
 
-# ==========
+# Refinements:
+# -- prompt user for file
+# -- check for required columns
+# -- rename columns in summary to something sensible
+# -- format histogram nicely
 
-# 1. Read file and check for required columns
-# (user input?)
+library(dplyr)
+library(readr)
+library(ggplot2)
 
-# 2. Group by protein name
+# Read file ---------------------------------------------------------------
 
-# 3. Summarize(?) getting count of rows for each protein name 
-# because each row is 1 domain
+datapath <- "/Users/theresa/Documents/home-github/data-analysis/R/count_domains_data"
+datafile <- "20180221_SGDproteins_atleast1domain.csv"
 
-# 4. Write data table of protein, # domains, sorted by # domains
+# unlike base R's read.csv, readr's read_csv gives a tbl that can be grouped
+proteins <- read_csv(file.path(datapath, datafile)) 
 
-# 5. Create histogram of domains per protein
+# Group by protein name ---------------------------------------------------
+
+proteins_by_protname <- group_by(proteins, proteins$`Gene > Proteins > Systematic Name`)
+
+# Count rows bearing each protein name  --------
+
+domains_per_protein <- summarize(proteins_by_protname, n())
+
+# use backticks around the column name because it has parentheses
+inorder <- arrange(domains_per_protein, desc(`n()`))
+
+# Create and save histogram of domains per protein ---------------------------------
+
+outputgraph <- file.path(datapath,"domains_per_prot_redundant.pdf")
+pdf(file = outputgraph)
+
+hist(domains_per_protein$`n()`, breaks = 70, col = "blue", main="Domains per protein including redundancies", xlab="domains identified in SGD")
+
+dev.off() # closes pdf output
+
+# Save data table -----------------------------------------------
+
+outputfile <- "proteins_by_number_domains.csv"
+write.csv(inorder, file.path(datapath,outputfile))
