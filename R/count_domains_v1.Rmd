@@ -1,0 +1,114 @@
+---
+title: "count_domains_v1"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Counting domains in proteins from SGD, v1
+
+On 2/21/2018 I downloaded proteins containing at least 1 identified domain, in a csv file with human-readable headers.
+
+This script counts the number of identified domains in each protein (grouped by systematic name, e.g. YLR190W).
+
+To start, we load some code packages into R, and give the folder location of the data files we want to use:
+
+``` {r loadstuff, message=FALSE, warning=FALSE}
+library(dplyr)
+library(readr)
+library(ggplot2)
+library(knitr)
+
+# datapath <- "/Users/theresa/Documents/home-github/data-analysis/R/count_domains_data"
+datapath <- "/Users/confocal/github_theresaswayne/data-analysis/R/count_domains_data"
+datafile <- "20180221_SGDproteins_atleast1domain.csv"
+```
+
+## The original file
+
+We read the CSV file from SGD and convert it into an R "object," and R tells us the columns it found:
+
+``` {r readdata}
+# unlike base R's read.csv, readr's read_csv gives a tbl that can be grouped
+proteins <- read_csv(file.path(datapath, datafile)) 
+```
+
+We can confirm it has 45780 rows and 8 columns:
+
+``` {r show original structure}
+dim(proteins)
+```
+
+And we can look at the top of the file:
+
+``` {r show original head,  results='asis'}
+kable(proteins[1:20,], caption = "Original protein data")
+```
+
+Now we can use the "group_by" function to collate all the rows that share the same systematic name.
+
+```{r groupby}
+proteins_by_protname <- group_by(proteins, proteins$`Gene > Proteins > Systematic Name`)
+```
+
+To see the effect of this, we run the "summarize" function and sort the table in decreasing order of number of rows.
+
+``` {r summarize and sort}
+# Count rows bearing each protein name  --------
+domains_per_protein <- summarize(proteins_by_protname, n())
+
+# Sort by # domains.
+# Use backticks around the column name because it has parentheses
+inorder <- arrange(domains_per_protein, desc(`n()`))
+```
+
+Now we have a table showing 5418 unique proteins and the number of detected domains in each:
+
+``` {r show ordered table, results='asis'}
+dim(inorder)
+kable(inorder[1:10,], caption = "Proteins sorted by # domains")
+```
+
+## Frequency distribution of domains per protein
+
+We can plot how many domains are observed per protein:
+
+```{r domains per protein, echo=FALSE, message=FALSE}
+hist(domains_per_protein$`n()`, breaks = 70, col = "blue", main="Domains per protein including redundancies", xlab="domains identified in SGD")
+```
+
+Finally, we can save a PDF of the plot, and the data table listing number of domains per protein:
+``` {r save data, message=FALSE}
+# Create and save histogram of domains per protein ---------------------------------
+
+outputgraph <- file.path(datapath,"domains_per_prot_redundant.pdf")
+pdf(file = outputgraph)
+
+hist(domains_per_protein$`n()`, breaks = 70, col = "blue", main="Domains per protein including redundancies", xlab="domains identified in SGD")
+
+invisible(dev.off()) # closes pdf output
+
+
+# Save data table -----------------------------------------------
+
+outputfile <- "proteins_by_number_domains.csv"
+write.csv(inorder, file.path(datapath,outputfile))
+
+```
+
+
+Future plans:
+
+```{r nextsteps}
+# Next steps:
+# -- eliminate redundant domains using start and end residues
+# -- filter by domains that are involved in protein-protein interactions
+
+# Refinements:
+# -- prompt user for file
+# -- check for required columns
+# -- rename columns in summary to something sensible
+# -- format histogram nicely
+```

@@ -27,7 +27,8 @@ library(ggplot2)
 
 # Read file ---------------------------------------------------------------
 
-datapath <- "/Users/theresa/Documents/home-github/data-analysis/R/count_domains_data"
+# datapath <- "/Users/theresa/Documents/home-github/data-analysis/R/count_domains_data"
+datapath <- "/Users/confocal/github_theresaswayne/data-analysis/R/count_domains_data"
 datafile <- "20180221_SGDproteins_atleast1domain.csv"
 
 # unlike base R's read.csv, readr's read_csv gives a tbl that can be grouped
