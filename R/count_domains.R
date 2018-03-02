@@ -36,7 +36,7 @@ proteins <- read_csv(file.path(datapath, datafile))
 
 # Group by protein name ---------------------------------------------------
 
-proteins_by_protname <- group_by(proteins, proteins$`Gene > Proteins > Systematic Name`)
+proteins_by_protname <- group_by(proteins, proteins$`Gene.proteins.secondaryIdentifier`)
 
 # Count rows bearing each protein name  --------
 
