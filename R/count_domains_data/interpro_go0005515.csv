@@ -1,0 +1,163 @@
+﻿Database,ID,Description
+InterPro,IPR000048,"IQ motif, EF-hand binding site"
+InterPro,IPR000157,Toll/interleukin-1 receptor homology (TIR) domain
+InterPro,IPR000177,Apple domain
+InterPro,IPR000210,BTB/POZ domain
+InterPro,IPR000225,Armadillo
+InterPro,IPR000253,Forkhead-associated (FHA) domain
+InterPro,IPR000261,EH domain
+InterPro,IPR000270,PB1 domain
+InterPro,IPR000357,HEAT repeat
+InterPro,IPR000488,Death domain
+InterPro,IPR000555,JAB1/MPN/MOV34 metalloenzyme domain
+InterPro,IPR000593,"RasGAP protein, C-terminal"
+InterPro,IPR000626,Ubiquitin domain
+InterPro,IPR000717,Proteasome component (PCI) domain
+InterPro,IPR000959,POLO box domain
+InterPro,IPR001007,VWFC domain
+InterPro,IPR001012,UBX domain
+InterPro,IPR001024,PLAT/LH2 domain
+InterPro,IPR001090,Ephrin receptor ligand binding domain
+InterPro,IPR001134,Netrin domain
+InterPro,IPR001202,WW domain
+InterPro,IPR001214,SET domain
+InterPro,IPR001258,NHL repeat
+InterPro,IPR001298,Filamin/ABP280 repeat
+InterPro,IPR001368,TNFR/NGFR cysteine-rich region
+InterPro,IPR001440,Tetratricopeptide repeat 1
+InterPro,IPR001452,SH3 domain
+InterPro,IPR001478,PDZ domain
+InterPro,IPR001487,Bromodomain
+InterPro,IPR001605,"Pleckstrin homology domain, spectrin-type"
+InterPro,IPR001611,Leucine-rich repeat
+InterPro,IPR001627,Sema domain
+InterPro,IPR001660,Sterile alpha motif domain
+InterPro,IPR001680,WD40 repeat
+InterPro,IPR001715,Calponin homology domain
+InterPro,IPR001810,F-box domain
+InterPro,IPR001875,Death effector domain
+InterPro,IPR001943,UVR domain
+InterPro,IPR002017,Spectrin repeat
+InterPro,IPR002083,MATH/TRAF domain
+InterPro,IPR002110,Ankyrin repeat
+InterPro,IPR002172,Low-density lipoprotein (LDL) receptor class A repeat
+InterPro,IPR002349,WW
+InterPro,IPR002350,Kazal domain
+InterPro,IPR003018,GAF domain
+InterPro,IPR003100,PAZ domain
+InterPro,IPR003102,"Coactivator CBP, pKID"
+InterPro,IPR003121,SWIB/MDM2 domain
+InterPro,IPR003151,"PIK-related kinase, FAT"
+InterPro,IPR003152,FATC domain
+InterPro,IPR003169,GYF domain
+InterPro,IPR003307,W2 domain
+InterPro,IPR003494,SHS2 domain inserted in FtsA
+InterPro,IPR003536,"Translocated intimin receptor, central domain"
+InterPro,IPR003652,"Ataxin, AXH domain"
+InterPro,IPR003877,SPRY domain
+InterPro,IPR003890,"MIF4G-like, type 3"
+InterPro,IPR003892,Ubiquitin system component Cue
+InterPro,IPR003961,Fibronectin type III
+InterPro,IPR003962,Fibronectin type III subdomain
+InterPro,IPR004045,"Glutathione S-transferase, N-terminal"
+InterPro,IPR004148,BAR domain
+InterPro,IPR004172,L27 domain
+InterPro,IPR005036,CBM21 (carbohydrate binding type-21) domain
+InterPro,IPR005043,"CAS/CSE, C-terminal"
+InterPro,IPR005617,"Groucho/TLE, N-terminal Q-rich domain"
+InterPro,IPR006020,PTB/PI domain
+InterPro,IPR006575,RWD domain
+InterPro,IPR006576,BRK domain
+InterPro,IPR006594,LIS1 homology motif
+InterPro,IPR006652,Kelch repeat type 1
+InterPro,IPR006828,Association with the SNF1 complex (ASC) domain
+InterPro,IPR006910,"Rad21/Rec8-like protein, N-terminal"
+InterPro,IPR007526,SWIRM domain
+InterPro,IPR007809,FlgN-like protein
+InterPro,IPR008974,TRAF-like
+InterPro,IPR008983,Tumour necrosis factor-like domain superfamily
+InterPro,IPR008984,SMAD/FHA domain superfamily
+InterPro,IPR009033,"Calreticulin/calnexin, P domain superfamily"
+InterPro,IPR009060,UBA-like superfamily
+InterPro,IPR009095,"TRADD, N-terminal"
+InterPro,IPR009590,"Protein Gp5, N-terminal OB-fold domain"
+InterPro,IPR010402,CCT domain
+InterPro,IPR010714,"Coatomer, alpha subunit, C-terminal"
+InterPro,IPR010935,SMCs flexible hinge
+InterPro,IPR011489,EMI domain
+InterPro,IPR011498,Kelch repeat type 2
+InterPro,IPR011930,Cell division protein FtsN
+InterPro,IPR011990,Tetratricopeptide-like helical domain superfamily
+InterPro,IPR013026,Tetratricopeptide repeat-containing domain
+InterPro,IPR013625,Tensin/EPS8 phosphotyrosine-binding domain
+InterPro,IPR013644,"1-deoxy-D-xylulose 5-phosphate reductoisomerase, C-terminal"
+InterPro,IPR013655,PAS fold-3
+InterPro,IPR013872,p53 transactivation domain
+InterPro,IPR015284,"Signal recognition particle (SRP) receptor alpha subunit, N-terminal"
+InterPro,IPR015369,Follistatin/Osteonectin EGF domain
+InterPro,IPR015631,Signalling lymphocyte activation molecule family receptors
+InterPro,IPR015915,Kelch-type beta propeller
+InterPro,IPR015943,WD40/YVTN repeat-like-containing domain superfamily
+InterPro,IPR017986,WD40-repeat-containing domain
+InterPro,IPR019134,"Cactin, C-terminal"
+InterPro,IPR019734,Tetratricopeptide repeat
+InterPro,IPR020067,Frizzled domain
+InterPro,IPR020981,"Monopolin complex, subunit Csm1/Pcs1"
+InterPro,IPR024237,VirE1
+InterPro,IPR024314,Suppressor of fused C-terminal
+InterPro,IPR024318,Negative regulator of Ofd1/Enhancer of translation termination 1
+InterPro,IPR024721,"Snurportin-1, N-terminal"
+InterPro,IPR024774,"Pleckstrin homology domain, Mcp5-type"
+InterPro,IPR024846,Tuftelin
+InterPro,IPR024855,UNC79
+InterPro,IPR024876,HEXIM2
+InterPro,IPR024945,Spt5 C-terminal domain
+InterPro,IPR025304,ALIX V-shaped domain
+InterPro,IPR025654,Peroxisome biogenesis factor 10
+InterPro,IPR025655,Peroxisomal membrane protein 14
+InterPro,IPR025718,"Histone deacetylase complex subunit SAP30, Sin3 binding domain"
+InterPro,IPR025885,"PapC, N-terminal domain"
+InterPro,IPR027266,"GTP-binding protein TrmE/Glycine cleavage system T protein, domain 1"
+InterPro,IPR027393,"Virus scaffolding protein, C-terminal"
+InterPro,IPR032957,Diamine acetyltransferase 1
+InterPro,IPR033621,TRAF-interacting protein with FHA domain-containing protein
+InterPro,IPR033994,"Tumor necrosis factor receptor 1A, death domain"
+InterPro,IPR033998,"Fas receptor, death domain"
+InterPro,IPR034029,"Tumour necrosis factor receptor 10A/B, death domain"
+InterPro,IPR034037,"Tumor necrosis factor receptor 21, death domain"
+InterPro,IPR034147,"RBM40, RNA recognition motif 1"
+InterPro,IPR034231,"Ephrin type-B receptor 1, ligand binding domain"
+InterPro,IPR034238,"Ephrin type-B receptor 2, ligand binding domain"
+InterPro,IPR034245,"Ephrin type-B receptor 3, ligand binding domain"
+InterPro,IPR034249,"MyD88, death domain"
+InterPro,IPR034251,"Ephrin type-A receptor 1, ligand binding domain"
+InterPro,IPR034263,"Ephrin type-A receptor 2, ligand binding domain"
+InterPro,IPR034266,"Ephrin type-A receptor 3, ligand binding domain"
+InterPro,IPR034270,"Ephrin type-A receptor 4, ligand binding domain"
+InterPro,IPR034277,"Ephrin type-A receptor 5, ligand binding domain"
+InterPro,IPR034280,"Ephrin type-A receptor 6, ligand binding domain"
+InterPro,IPR034283,"Ephrin type-A receptor 7, ligand binding domain"
+InterPro,IPR034287,"Ephrin type-A receptor 8, ligand binding domain"
+InterPro,IPR034290,"Ephrin type-B receptor 4, ligand binding domain"
+InterPro,IPR036020,WW domain superfamily
+InterPro,IPR036028,SH3-like domain superfamily
+InterPro,IPR036034,PDZ superfamily
+InterPro,IPR036047,F-box-like domain superfamily
+InterPro,IPR036055,LDL receptor-like superfamily
+InterPro,IPR036058,Kazal domain superfamily
+InterPro,IPR036085,PAZ domain superfamily
+InterPro,IPR036096,"Ataxin, AXH domain superfamily"
+InterPro,IPR036116,Fibronectin type III superfamily
+InterPro,IPR036277,SMCs flexible hinge superfamily
+InterPro,IPR036322,WD40-repeat-containing domain superfamily
+InterPro,IPR036392,PLAT/LH2 domain superfamily
+InterPro,IPR036427,Bromodomain-like superfamily
+InterPro,IPR036679,FlgN-like superfamily
+InterPro,IPR036729,"TRADD, N-terminal domain superfamily"
+InterPro,IPR036790,Frizzled cysteine-rich domain superfamily
+InterPro,IPR036892,L27 domain superfamily
+InterPro,IPR036947,POLO box domain superfamily
+InterPro,IPR037003,"Translocated intimin receptor, central domain superfamily"
+InterPro,IPR037224,"PapC, N-terminal domain superfamily"
+InterPro,IPR037286,Fibulin-2
+InterPro,IPR038175,CBM21 domain superfamily
