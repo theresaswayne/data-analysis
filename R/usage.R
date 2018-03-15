@@ -3,7 +3,6 @@
 
 library(dplyr)
 library(readr)
-library(ggplot2)
 
 # Import data ------
 
@@ -12,36 +11,31 @@ datapath <- "/Users/confocal/github_theresaswayne/data-analysis/R/usage_data"
 datafile <- "03012017_03012018_charges_report_source_data.csv"
 
 # unlike base R's read.csv, readr's read_csv gives a tbl that can be grouped
-#usage <- read.csv(file.path(datapath, datafile)) 
 usage <- read_csv(file.path(datapath, datafile)) # errors result, but seems ok
 
-# to get the true total hours, select only microscopes, workstation, and chargeable services
-equipment_usage <- dplyr::filter(usage, !grepl("Lenses", `Charge Name`)) 
+# Filter by date ----------------------------------------------------------
+#usage <- filter(usage, `Completion Date` > "2018-01-01")
 
-# Group by assistance level ---------------------------------------------------
-usage_by_assist <- group_by(equipment_usage, `Usage Type`)
-hrs_by_assist <- summarise(usage_by_assist, hours = sum(Quantity))
+# Calculate hours based on Usage Type column ------------------------------
 
-# Add together assisted, training, and service ----------------------------
-# assisted use = contains "Assisted", "Training", or "1" [1 = Img Proc service]
-# non-assisted use = contains "Unassisted" or "Independent"
+hrs_assist <- dplyr::filter(usage, grepl("Assisted|Training|1", `Usage Type`)) %>%
+  dplyr::select(Quantity) %>%
+  sum()
 
-hrs_assisted <- dplyr::filter(hrs_by_assist, grepl("Assisted|Training|1", `Usage Type`)) 
-total_assisted <- sum(hrs_assisted$hours)
+hrs_unass <- dplyr::filter(usage, grepl("Unassisted|Independent", `Usage Type`)) %>%
+  dplyr::select(Quantity) %>%
+  sum()
 
-hrs_unass <- dplyr::filter(hrs_by_assist, grepl("Unassisted|Independent", `Usage Type`)) 
-total_unass <- sum(hrs_unass$hours)
 
-#total_hours <- sum(hrs_by_assist$hours)
+# Summarize ---------------------------------------------------------------
 
-headers <- c("Usage Type","Hours")
 usage_type <- c("Assisted/Service", "Non-Assisted")
-hours <- c(total_assisted, total_unass)
+hours <- c(hrs_assist, hrs_unass)
 
-hrs_summ <- cbind(usage_type, hours) %>%
+hrs_summ <- cbind(`Usage Type` = usage_type, Hours = hours) %>%
   as.data.frame(stringsAsFactors = FALSE)
 
-hrs_summ$hours <- as.numeric(as.character(hrs_summ$hours))
+hrs_summ$Hours <- as.numeric(as.character(hrs_summ$Hours)) # force R to see the hours as numeric
 
 hrs_summ <- mutate(hrs_summ, 
-                hrs_pct = hours / sum(hours))
+                   Percent = round((Hours / sum(Hours)), 2))
