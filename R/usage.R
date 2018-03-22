@@ -7,9 +7,10 @@ library(readr)
 # Import data ------
 
 datapath <- "/Users/confocal/github_theresaswayne/data-analysis/R/usage_data"
-datapath <- "/Users/theresa/Documents/home-github/data-analysis/R/usage_data"
+#datapath <- "/Users/theresa/Documents/home-github/data-analysis/R/usage_data"
 #datafile <- "09012017_01312018_charges_report_source_data.csv"
-datafile <- "01012018_03012018_charges_report_source_data.csv"
+#datafile <- "01012018_03012018_charges_report_source_data.csv"
+datafile <- "01012017_01012018_charges_report_source_data.csv"
 
 # unlike base R's read.csv, readr's read_csv gives a tbl that can be grouped
 usage <- read_csv(file.path(datapath, datafile)) # errors result, but seems ok
@@ -50,19 +51,36 @@ hrs_HICCC <- dplyr::filter(eqpt_service_usage, grepl("Cancer Center Member", `Pr
   dplyr::select(Quantity) %>%
   sum()
 
-hrs_InternalNonHICCC <- dplyr::filter(eqpt_service_usage, grepl("Dept of Pathology|Internal - Columbia", `Price Type`)) %>%
+hrs_NonHICCC <- dplyr::filter(eqpt_service_usage, grepl("Dept of Pathology|Internal - Columbia|External - Academic", `Price Type`)) %>%
   dplyr::select(Quantity) %>%
   sum()
 
-# users_HICCC <-
-# Summarize
-price_type <- c("HICCC", "Non-HICCC Internal")
-hoursCC <- c(hrs_HICCC, hrs_InternalNonHICCC)
+appts_HICCC <- dplyr::filter(eqpt_service_usage, grepl("Cancer Center Member", `Price Type`)) %>%
+  dplyr::select(`Customer Lab`)
 
-hrs_cc_summ <- cbind(`Price Type` = price_type, Hours = hoursCC) %>%
+appts_HICCC$`Customer Lab` <- factor(appts_HICCC$`Customer Lab`)
+users_HICCC <- nlevels(appts_HICCC$`Customer Lab`)
+
+appts_NonHICCC <- dplyr::filter(eqpt_service_usage, grepl("Dept of Pathology|Internal - Columbia|External - Academic", `Price Type`)) %>%
+  dplyr::select(`Customer Lab`)
+
+appts_NonHICCC$`Customer Lab` <- factor(appts_NonHICCC$`Customer Lab`)
+users_NonHICCC <- nlevels(appts_NonHICCC$`Customer Lab`)
+
+# Summarize
+price_type <- c("HICCC", "Non-HICCC")
+hoursCC <- c(hrs_HICCC, hrs_NonHICCC)
+usersCC <- c(users_HICCC, users_NonHICCC)
+
+hrs_cc_summ <- cbind(`Price Type` = price_type, Hours = hoursCC, Labs = usersCC) %>%
   as.data.frame(stringsAsFactors = FALSE)
 
 hrs_cc_summ$Hours <- as.numeric(as.character(hrs_cc_summ$Hours)) # force R to see the hours as numeric
 
 hrs_cc_summ <- mutate(hrs_cc_summ, 
-                   Percent = round((Hours / sum(Hours)), 2))
+                   HrsPercent = round((Hours / sum(Hours)), 2))
+
+hrs_cc_summ$Labs <- as.numeric(as.character(hrs_cc_summ$Labs)) # force R to see the labs as numeric
+
+hrs_cc_summ <- mutate(hrs_cc_summ, 
+                      LabsPercent = round((Labs / sum(Labs)), 2))
