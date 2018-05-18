@@ -6,17 +6,20 @@ library(readr)
 
 # Import data ------
 
-datapath <- "/Users/confocal/github_theresaswayne/data-analysis/R/usage_data"
+datafile <- file.choose() # opens a file chooser window, no message
+
+#datapath <- "/Users/confocal/github_theresaswayne/data-analysis/R/usage_data"
 #datapath <- "/Users/theresa/Documents/home-github/data-analysis/R/usage_data"
 #datafile <- "09012017_01312018_charges_report_source_data.csv"
 #datafile <- "01012018_03012018_charges_report_source_data.csv"
-datafile <- "01012017_01012018_charges_report_source_data.csv"
+#datafile <- "01012017_01012018_charges_report_source_data.csv"
 
 # unlike base R's read.csv, readr's read_csv gives a tbl that can be grouped
-usage <- read_csv(file.path(datapath, datafile)) # errors result, but seems ok
+#usage <- read_csv(file.path(datapath, datafile)) # errors result, but seems ok
+usage <- read_csv(file.path(datafile)) # errors result, but seems ok
 
 # Optional filter by date ----------------------------------------------------------
-#usage <- filter(usage, `Completion Date` > "2018-01-01")
+#usage <- filter(usage, `Completion Date` > "2018-03-01")
 
 
 # Assisted vs Non-assisted ------------------------------------------------
