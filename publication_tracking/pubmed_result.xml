@@ -1,0 +1,122 @@
+<?xml version="1.0"?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2017//EN" "https://dtd.nlm.nih.gov/ncbi/pubmed/out/pubmed_170101.dtd">
+<PubmedArticleSet>
+
+<PubmedArticle>
+    <MedlineCitation Status="In-Process" Owner="NLM">
+        <PMID Version="1">27519848</PMID>
+        <DateCreated>
+            <Year>2016</Year>
+            <Month>08</Month>
+            <Day>13</Day>
+        </DateCreated>
+        <DateRevised>
+            <Year>2017</Year>
+            <Month>02</Month>
+            <Day>15</Day>
+        </DateRevised>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1600-0455</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <Volume>58</Volume>
+                    <Issue>4</Issue>
+                    <PubDate>
+                        <Year>2017</Year>
+                        <Month>Apr</Month>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Acta radiologica (Stockholm, Sweden : 1987)</Title>
+                <ISOAbbreviation>Acta Radiol</ISOAbbreviation>
+            </Journal>
+            <ArticleTitle>Diagnostic reference levels in low- and middle-income countries: early &quot;ALARAm&quot; bells?</ArticleTitle>
+            <Pagination>
+                <MedlinePgn>442-448</MedlinePgn>
+            </Pagination>
+            <ELocationID EIdType="doi" ValidYN="Y">10.1177/0284185116658681</ELocationID>
+            <Abstract>
+                <AbstractText>Background In 1996 the International Commission on Radiological Protection (ICRP) introduced diagnostic reference levels (DRLs) as a quality assurance tool for radiation dose optimization. While many countries have published DRLs, available data are largely from high-income countries. There is arguably a greater need for DRLs in low- and middle-income-countries (LMICs), where imaging equipment may be older and trained imaging technicians are scarce. To date, there has been no critical analysis of the published work on DRLs in LMICs. Such work is important to evaluate data deficiencies and stimulate future quality assurance initiatives. Purpose To review the published work on DRLs in LMICs and to critically analyze the comprehensiveness of available data. Material and Methods Medline, Scopus, and Web of Science database searches were conducted for English-language articles published between 1996 and 2015 documenting DRLs for diagnostic imaging in LMICs. Retrieved articles were analyzed and classified by geographical region, country of origin, contributing author, year of publication, imaging modality, body part, and patient age. Results Fifty-three articles reported DRLs for 28 of 135 LMICs (21%), reflecting data from 26/104 (25%) middle-income countries and 2/31 (6%) low-income countries. General radiography (n = 26, 49%) and computerized tomography (n = 17, 32%) data were most commonly reported. Pediatric DRLs (n = 14, 26%) constituted approximately one-quarter of published work. Conclusion Published DRL data are deficient in the majority of LMICs, with the paucity most striking in low-income countries. DRL initiatives are required in LMICs to enhance dose optimization.</AbstractText>
+            </Abstract>
+            <AuthorList CompleteYN="Y">
+                <Author ValidYN="Y">
+                    <LastName>Meyer</LastName>
+                    <ForeName>Steven</ForeName>
+                    <Initials>S</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Radiodiagnosis, Department of Medical Imaging and Clinical Oncology, Faculty of Medicine and Health Sciences, Stellenbosch University, Cape Town, South Africa.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Groenewald</LastName>
+                    <ForeName>Willem A</ForeName>
+                    <Initials>WA</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Radiodiagnosis, Department of Medical Imaging and Clinical Oncology, Faculty of Medicine and Health Sciences, Stellenbosch University, Cape Town, South Africa.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+                <Author ValidYN="Y">
+                    <LastName>Pitcher</LastName>
+                    <ForeName>Richard D</ForeName>
+                    <Initials>RD</Initials>
+                    <AffiliationInfo>
+                        <Affiliation>Division of Radiodiagnosis, Department of Medical Imaging and Clinical Oncology, Faculty of Medicine and Health Sciences, Stellenbosch University, Cape Town, South Africa.</Affiliation>
+                    </AffiliationInfo>
+                </Author>
+            </AuthorList>
+            <Language>eng</Language>
+            <PublicationTypeList>
+                <PublicationType UI="D016428">Journal Article</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2016</Year>
+                <Month>08</Month>
+                <Day>20</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <Country>England</Country>
+            <MedlineTA>Acta Radiol</MedlineTA>
+            <NlmUniqueID>8706123</NlmUniqueID>
+            <ISSNLinking>0284-1851</ISSNLinking>
+        </MedlineJournalInfo>
+        <KeywordList Owner="NOTNLM">
+            <Keyword MajorTopicYN="N">Diagnostic reference levels (DRL)</Keyword>
+            <Keyword MajorTopicYN="N">physics</Keyword>
+            <Keyword MajorTopicYN="N">radiation dose optimization</Keyword>
+            <Keyword MajorTopicYN="N">radiation safety</Keyword>
+        </KeywordList>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2016</Year>
+                <Month>8</Month>
+                <Day>16</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2016</Year>
+                <Month>8</Month>
+                <Day>16</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2016</Year>
+                <Month>8</Month>
+                <Day>14</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>ppublish</PublicationStatus>
+        <ArticleIdList>
+            <ArticleId IdType="pubmed">27519848</ArticleId>
+            <ArticleId IdType="pii">0284185116658681</ArticleId>
+            <ArticleId IdType="doi">10.1177/0284185116658681</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+</PubmedArticleSet>
