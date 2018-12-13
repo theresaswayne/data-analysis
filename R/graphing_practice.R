@@ -46,4 +46,32 @@ full_plus <-  full +
 print(full_plus)
 
 # using the plot name you can save any plot you've made
-ggsave(plot = full, filename = here("full.png")) # format matches extension
+# ggsave(plot = full, filename = here("full.png")) # format matches extension
+
+# Histograms --------------------------------------------------------------
+
+# the aes in a histogram is the column you want to plot
+histo <- ggplot(data = mpg, aes(hwy)) +
+    geom_histogram(binwidth = 5)
+
+# the minimum you need to produce a plot is (I think) data, aes, geom 
+print(histo)
+
+# you can do variations on graphing a dataset by adding the layers piecemeal
+
+base_histo <- ggplot(data = mpg, aes(hwy))
+
+nice_histo <- base_histo +
+  geom_histogram(binwidth = 1,colour = "blue", fill = "blue") +
+  ggtitle("Smaller bins")
+
+print(nice_histo)
+
+# see https://stackoverflow.com/questions/3541713/how-to-plot-two-histograms-together-in-r (ggplot)
+#ggplot(vegLengths, aes(length, fill = veg)) + 
+#  geom_histogram(alpha = 0.5, position = 'identity')
+
+#ggplot(iris, aes(x = Sepal.Length, fill = Species)) +
+#  geom_histogram(alpha = 0.6, position = "identity")
+
+# Scatter plots --------------------------------------------------------------
