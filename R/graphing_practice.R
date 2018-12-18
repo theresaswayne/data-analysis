@@ -1,17 +1,28 @@
 # graphing_practice.R
 
+# See also -------------
+
+# see https://stackoverflow.com/questions/3541713/how-to-plot-two-histograms-together-in-r (ggplot)
+#ggplot(vegLengths, aes(length, fill = veg)) + 
+#  geom_histogram(alpha = 0.5, position = 'identity')
+
+#ggplot(iris, aes(x = Sepal.Length, fill = Species)) +
+#  geom_histogram(alpha = 0.6, position = "identity")
+
+# Setup --------------
+
 # load packages if not already done
 require(ggplot2)
 require(here)
+require(dplyr)
 
-# this is using the gas mileage sample data
+# using the gas mileage sample data
 print(head(mpg))
 
 
-# Quick plot --------------------------------------------------------------
+# qplot (Quick plot) --------------------------------------------------------------
 
-
-# quick plot with sensible defaults -- legend, gridlines, shading
+# Sensible defaults -- legend, gridlines, shading
 # -- column names can be used (no $ needed)
 # -- give the dataset, x, y; an additional [continuous] dimension to vary color by;
 #     and the symbol
@@ -24,54 +35,56 @@ print(quick)
 # to save a plot, run ggsave after you generate it
 # ggsave (here("quickplot.png")) # defaults to last plot generated
 
-# Full ggplot --------------------------------------------------------------
+# ggplot --------------------------------------------------------------
 
-# each line is a full command followed by a +
-# assigning a name lets you print to plots panel 
+# Basic template (from cheatsheet)
+# Each line is a full command followed by a +
+# Assign a name so you can print to the Plots panel, save, or add more features later
 
-full <- ggplot(data = mpg, aes(x=cty, y=hwy)) + # close paren then add another line with +
-    geom_point(aes(color=cyl)) + 
-    geom_smooth(method = "lm") + # line
-    coord_cartesian()
+# Required elements: data; aes for axes; geom function for type of plot
 
-print(full)
+simple_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
+  geom_point()
+
+print(simple_plot)
+
+simple_hist <- ggplot(data = mpg, aes(cty)) + # aes in a histogram is the column you want to plot
+  geom_histogram()
+
+print(simple_hist)
+
+# You can save any plot you've made
+# ggsave(plot = simple_plot, filename = here("reports", "simple.png")) # format matches extension
 
 # Add a new layer to a plot with a geom_*() or stat_*() function. 
 
-full_plus <-  full +
+fancy_plot <-  simple_plot +
+  aes(color=cyl) + # vary color by another variable
   scale_color_gradient() +
-  theme_bw() + # no shading
-  ggtitle("GGPlot")
+  theme_bw() + # no shading in background
+  ggtitle("Color varied by Cylinder")
 
-print(full_plus)
+print(fancy_plot)
 
-# using the plot name you can save any plot you've made
-# ggsave(plot = full, filename = here("full.png")) # format matches extension
-
-# Histograms --------------------------------------------------------------
-
-# the aes in a histogram is the column you want to plot
-histo <- ggplot(data = mpg, aes(hwy)) +
-    geom_histogram(binwidth = 5)
-
-# the minimum you need to produce a plot is (I think) data, aes, geom 
-print(histo)
-
-# you can do variations on graphing a dataset by adding the layers piecemeal
-
-base_histo <- ggplot(data = mpg, aes(hwy))
-
-nice_histo <- base_histo +
-  geom_histogram(binwidth = 1,colour = "blue", fill = "blue") +
+fancy_hist <- ggplot(data = mpg, aes(cty))  +
+  geom_histogram(binwidth = 1, colour = "blue", fill = "blue") +
   ggtitle("Smaller bins")
 
-print(nice_histo)
+print(fancy_hist)
 
-# see https://stackoverflow.com/questions/3541713/how-to-plot-two-histograms-together-in-r (ggplot)
-#ggplot(vegLengths, aes(length, fill = veg)) + 
-#  geom_histogram(alpha = 0.5, position = 'identity')
+# Scatter plots: varying coordinate systems --------------------------------------------------------------
 
-#ggplot(iris, aes(x = Sepal.Length, fill = Species)) +
-#  geom_histogram(alpha = 0.6, position = "identity")
+log_plot <- simple_plot +
+  scale_y_log10() + # Plot y on log10 scale
+  labs(x = "mpg, city", y = "mpg, hwy", title = "Log Plot") 
+print(log_plot)
 
-# Scatter plots --------------------------------------------------------------
+# Scatter plots: varying point styles --------------------------------------------------------------
+
+# point attributes are alpha, colour[sic], fill, group, shape, size, stroke
+# https://ggplot2.tidyverse.org/articles/ggplot2-specs.html
+# https://ggplot2.tidyverse.org/reference/geom_point.html
+
+# dot_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
+#   scale_y_log10() + # Plot y on log10 scale  
+#   geom_point()
