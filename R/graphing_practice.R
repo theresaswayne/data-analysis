@@ -85,6 +85,9 @@ print(log_plot)
 # https://ggplot2.tidyverse.org/articles/ggplot2-specs.html
 # https://ggplot2.tidyverse.org/reference/geom_point.html
 
-# dot_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
-#   scale_y_log10() + # Plot y on log10 scale  
-#   geom_point()
+dot_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
+  scale_y_log10() + # Plot y on log10 scale  
+  geom_point(aes(shape = "circle"), size = 0.1, alpha = 0.5) + 
+  labs(x = "mpg, city", y = "mpg, hwy", title = "Circle size 0.1 with 0.25 transparency")
+
+print(dot_plot)
