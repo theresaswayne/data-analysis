@@ -84,10 +84,12 @@ print(log_plot)
 # point attributes are alpha, colour[sic], fill, group, shape, size, stroke
 # https://ggplot2.tidyverse.org/articles/ggplot2-specs.html
 # https://ggplot2.tidyverse.org/reference/geom_point.html
+# colours: http://research.stowers.org/mcm/efg/R/Color/Chart/
 
 dot_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
   scale_y_log10() + # Plot y on log10 scale  
-  geom_point(aes(shape = "circle"), size = 0.1, alpha = 0.5) + 
-  labs(x = "mpg, city", y = "mpg, hwy", title = "Circle size 0.1 with 0.25 transparency")
+  geom_point(colour = 28, size = 0.5, alpha = 0.5) + 
+  theme_classic() + # no fill
+  labs(x = "mpg, city", y = "mpg, hwy", title = "Point size 0.5 with 0.25 transparency")
 
 print(dot_plot)
