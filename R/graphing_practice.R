@@ -17,7 +17,7 @@ require(here)
 require(dplyr)
 
 # using the gas mileage sample data
-print(head(mpg))
+# print(head(mpg))
 
 
 # qplot (Quick plot) --------------------------------------------------------------
@@ -27,69 +27,131 @@ print(head(mpg))
 # -- give the dataset, x, y; an additional [continuous] dimension to vary color by;
 #     and the symbol
 
-quick <- qplot(data = mpg, x=cty, y=hwy, color = cyl, geom = "point", main = "QPlot")
+# Fig 1 ------
+quick <- qplot(data = mpg, x=cty, y=hwy, color = cyl, geom = "point", main = "Fig. 1: Qplot")
 
-# to show a plot from a script, run print
-print(quick)
+# to show a plot from a script, just say the name
+quick
 
-# to save a plot, run ggsave after you generate it
+# To save a plot, run ggsave after you generate it
 # ggsave (here("quickplot.png")) # defaults to last plot generated
+
+# Save any plot by name
+# ggsave(plot = quick, filename = here("reports", "quick.png")) # format matches extension
 
 # ggplot --------------------------------------------------------------
 
-# Basic template (from cheatsheet)
+# Start with basic template from cheatsheet
 # Each line is a full command followed by a +
+
 # Assign a name so you can print to the Plots panel, save, or add more features later
 
 # Required elements: data; aes for axes; geom function for type of plot
-
-simple_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
-  geom_point()
-
-print(simple_plot)
-
-simple_hist <- ggplot(data = mpg, aes(cty)) + # aes in a histogram is the column you want to plot
-  geom_histogram()
-
-print(simple_hist)
-
-# You can save any plot you've made
-# ggsave(plot = simple_plot, filename = here("reports", "simple.png")) # format matches extension
-
 # Add a new layer to a plot with a geom_*() or stat_*() function. 
 
+# Fig 2 ---------
+simple_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
+  geom_point() +
+  labs(title = "Fig. 2: simple scatter plot")
+
+simple_plot
+
+
+# Fig 3 ---------
+simple_hist <- ggplot(data = mpg, aes(cty)) + # aes in a histogram is the column you want to plot
+  geom_histogram() +
+  labs(title = "Fig. 3: simple histogram")
+
+simple_hist
+
+
+# Histograms ------
+# Fig 4 --------
 fancy_plot <-  simple_plot +
   aes(color=cyl) + # vary color by another variable
   scale_color_gradient() +
   theme_bw() + # no shading in background
-  ggtitle("Color varied by Cylinder")
+  ggtitle("Fig. 4: Color varied by Cylinder")
 
-print(fancy_plot)
+fancy_plot
 
+# Fig 5 ---------
 fancy_hist <- ggplot(data = mpg, aes(cty))  +
   geom_histogram(binwidth = 1, colour = "blue", fill = "blue") +
-  ggtitle("Smaller bins")
+  ggtitle("Fig. 5: Smaller bins")
 
-print(fancy_hist)
+fancy_hist
 
-# Scatter plots: varying coordinate systems --------------------------------------------------------------
+# Scatter: coordinate systems --------------------------------------------------------------
 
+# Fig 6 ---------
 log_plot <- simple_plot +
   scale_y_log10() + # Plot y on log10 scale
-  labs(x = "mpg, city", y = "mpg, hwy", title = "Log Plot") 
+  labs(x = "mpg, city", y = "mpg, hwy", title = "Fig. 6: Log Plot") 
 print(log_plot)
 
-# Scatter plots: varying point styles --------------------------------------------------------------
+# Scatter: point styles --------------------------------------------------------------
 
 # point attributes are alpha, colour[sic], fill, group, shape, size, stroke
 # https://ggplot2.tidyverse.org/articles/ggplot2-specs.html
 # https://ggplot2.tidyverse.org/reference/geom_point.html
 # colours: http://research.stowers.org/mcm/efg/R/Color/Chart/
 
+# Fig 7 ---------
 dot_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
   scale_y_log10() + # Plot y on log10 scale  
   geom_point(colour = 28, size = 0.5, alpha = 0.5) + 
   theme_classic() + # no fill
-  labs(x = "mpg, city", y = "mpg, hwy", title = "Point size 0.5 with 0.25 transparency")
+  labs(x = "mpg, city", y = "mpg, hwy", title = "Fig. 7: Point size 0.5 with 0.25 transparency")
 
 print(dot_plot)
+
+# Scatter: varying point color by another variable -----------
+
+#Fig 8 ---------
+# continuous color
+iris_plot <- ggplot(iris) + 
+  geom_point(aes(x=Sepal.Width, y=Sepal.Length, colour=Petal.Length)) + 
+  scale_colour_gradient() +
+  labs(title = "Fig. 8: Default (continuous) color coding")
+print(iris_plot)
+
+# using https://stackoverflow.com/questions/17713456/easiest-way-to-discretize-continuous-scales-for-ggplot2-color-scales
+
+# Fig 9 -----------
+# colors from specified gradient end/middle points
+iris_identity <- ggplot(iris) + 
+  geom_point(aes(x=Sepal.Width, y=Sepal.Length,
+                 colour=bincol(Petal.Length,"blue","yellow","red")), size=4) +
+  scale_color_identity("Petal.Length", labels=labels, 
+                       breaks=breaks, guide="legend") +
+  labs(title = "Fig. 9: Colors created to span a set of specified colors")
+
+iris_identity
+
+
+# Fig 10 ---------
+# based on answers from stackoverflow, adapting to scatter data
+p2<- ggplot(iris, aes(x=Sepal.Width,y=Sepal.Length,fill=cut(Petal.Length, c(0,3,6,Inf)))) +
+  geom_tile() +
+  scale_fill_brewer(type="seq",palette = "YlGn") + # colors based on a yellow-green palette
+  guides(fill=guide_legend(title="Petal Length")) +
+  labs(title = "Fig. 10: Discrete color series created from the Yellow-Green palette")
+
+p2
+
+# Giving names to the breaks and labels
+# Fig 11 --------
+mybreaks <- c(0,3,6,Inf) # bins
+mylabels <- c("≤ 3", "3 - 6", "> 6") # null added at end to avoid warning about labels and breaks being same length
+
+p3 <- ggplot(iris) +
+  geom_point(aes(x=Sepal.Width, y=Sepal.Length,
+               colour=cut(Petal.Length, mybreaks))) +
+  theme_classic() +
+  scale_colour_brewer("Petal Length", type="seq",palette = "YlGn", labels = mylabels, guide = "legend") +
+  labs(title = "Fig. 11: Scatterplot with color change at specified breaks in data")
+
+p3
+
+
