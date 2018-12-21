@@ -120,14 +120,14 @@ print(iris_plot)
 
 # Fig 9 -----------
 # colors from specified gradient end/middle points
-iris_identity <- ggplot(iris) + 
-  geom_point(aes(x=Sepal.Width, y=Sepal.Length,
-                 colour=bincol(Petal.Length,"blue","yellow","red")), size=4) +
-  scale_color_identity("Petal.Length", labels=labels, 
-                       breaks=breaks, guide="legend") +
-  labs(title = "Fig. 9: Colors created to span a set of specified colors")
-
-iris_identity
+# iris_identity <- ggplot(iris) + 
+#   geom_point(aes(x=Sepal.Width, y=Sepal.Length,
+#                  colour=bincol(Petal.Length,"blue","yellow","red")), size=4) +
+#   scale_color_identity("Petal.Length", labels=labels, 
+#                        breaks=breaks, guide="legend") +
+#   labs(title = "Fig. 9: Colors created to span a set of specified colors")
+# 
+# iris_identity
 
 
 # Fig 10 ---------
@@ -138,7 +138,7 @@ p2<- ggplot(iris, aes(x=Sepal.Width,y=Sepal.Length,fill=cut(Petal.Length, c(0,3,
   guides(fill=guide_legend(title="Petal Length")) +
   labs(title = "Fig. 10: Discrete color series created from the Yellow-Green palette")
 
-p2
+print(p2)
 
 # Giving names to the breaks and labels
 # Fig 11 --------
@@ -152,6 +152,6 @@ p3 <- ggplot(iris) +
   scale_colour_brewer("Petal Length", type="seq",palette = "YlGn", labels = mylabels, guide = "legend") +
   labs(title = "Fig. 11: Scatterplot with color change at specified breaks in data")
 
-p3
+print(p3)
 
 
