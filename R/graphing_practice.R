@@ -15,6 +15,7 @@
 require(ggplot2)
 require(here)
 require(dplyr)
+require(RColorBrewer)
 
 # using the gas mileage sample data
 # print(head(mpg))
@@ -116,42 +117,53 @@ iris_plot <- ggplot(iris) +
   labs(title = "Fig. 8: Default (continuous) color coding")
 print(iris_plot)
 
-# using https://stackoverflow.com/questions/17713456/easiest-way-to-discretize-continuous-scales-for-ggplot2-color-scales
 
-# Fig 9 -----------
-# colors from specified gradient end/middle points
-# iris_identity <- ggplot(iris) + 
-#   geom_point(aes(x=Sepal.Width, y=Sepal.Length,
-#                  colour=bincol(Petal.Length,"blue","yellow","red")), size=4) +
-#   scale_color_identity("Petal.Length", labels=labels, 
-#                        breaks=breaks, guide="legend") +
-#   labs(title = "Fig. 9: Colors created to span a set of specified colors")
-# 
-# iris_identity
-
-
-# Fig 10 ---------
-# based on answers from stackoverflow, adapting to scatter data
+# Fig 9 ---------
+# using ideas from https://stackoverflow.com/questions/17713456/easiest-way-to-discretize-continuous-scales-for-ggplot2-color-scales
 p2<- ggplot(iris, aes(x=Sepal.Width,y=Sepal.Length,fill=cut(Petal.Length, c(0,3,6,Inf)))) +
   geom_tile() +
   scale_fill_brewer(type="seq",palette = "YlGn") + # colors based on a yellow-green palette
   guides(fill=guide_legend(title="Petal Length")) +
-  labs(title = "Fig. 10: Discrete color series created from the Yellow-Green palette")
+  labs(title = "Fig. 9: Tile plot with discrete color series created from the Yellow-Green palette")
 
 print(p2)
 
-# Giving names to the breaks and labels
-# Fig 11 --------
+# Fig 10 --------
+# Adapting to scatter plot, and giving names to the intervals, for use in the legend
+# For a scatter plot you have to use scale_colour..., rather than scale_fill_...
+
 mybreaks <- c(0,3,6,Inf) # bins
-mylabels <- c("≤ 3", "3 - 6", "> 6") # null added at end to avoid warning about labels and breaks being same length
+mylabels <- c("≤ 3", "3 - 6", "> 6") 
 
 p3 <- ggplot(iris) +
   geom_point(aes(x=Sepal.Width, y=Sepal.Length,
                colour=cut(Petal.Length, mybreaks))) +
   theme_classic() +
   scale_colour_brewer("Petal Length", type="seq",palette = "YlGn", labels = mylabels, guide = "legend") +
-  labs(title = "Fig. 11: Scatterplot with color change at specified breaks in data")
+  labs(title = "Fig. 10: Scatterplot with color change at specified breaks in data")
 
 print(p3)
+
+
+# Color palettes ----------
+## create a sequential palette for usage and show colors
+mypalette<-brewer.pal(7,"Greens")
+image(1:7,1,as.matrix(1:7),col=mypalette,xlab="Greens (sequential)",
+      ylab="",xaxt="n",yaxt="n",bty="n")
+## display a divergent palette
+display.brewer.pal(7,"BrBG")
+## display a qualitative palette
+display.brewer.pal(7,"Accent")
+## display a palettes simultanoeusly
+#display.brewer.all(n=10, exact.n=FALSE)
+#display.brewer.all()
+display.brewer.all(type="div")
+display.brewer.all(type="seq")
+display.brewer.all(type="qual") 
+display.brewer.all(n=5,type="div",exact.n=TRUE)
+display.brewer.all(colorblindFriendly=TRUE)
+print(brewer.pal.info)
+print(brewer.pal.info["Blues",])
+print(brewer.pal.info["Blues",]$maxcolors)
 
 
