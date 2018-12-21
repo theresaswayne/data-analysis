@@ -30,11 +30,8 @@ require(dplyr)
 # Fig 1 ------
 quick <- qplot(data = mpg, x=cty, y=hwy, color = cyl, geom = "point", main = "Fig. 1: Qplot")
 
-# To show a plot while using Run, just say the name
-quick # will work with Run but not Source
-
-# To show a plot with Run OR Source, use print
-#print(quick)
+# to show a plot from a script, just say the name
+quick
 
 # To save a plot, run ggsave after you generate it
 # ggsave (here("quickplot.png")) # defaults to last plot generated
@@ -57,7 +54,7 @@ simple_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
   geom_point() +
   labs(title = "Fig. 2: simple scatter plot")
 
-#print(simple_plot)
+simple_plot
 
 
 # Fig 3 ---------
@@ -65,7 +62,7 @@ simple_hist <- ggplot(data = mpg, aes(cty)) + # aes in a histogram is the column
   geom_histogram() +
   labs(title = "Fig. 3: simple histogram")
 
-#print(simple_hist)
+simple_hist
 
 
 # Histograms ------
@@ -76,14 +73,14 @@ fancy_plot <-  simple_plot +
   theme_bw() + # no shading in background
   ggtitle("Fig. 4: Color varied by Cylinder")
 
-#print(fancy_plot)
+fancy_plot
 
 # Fig 5 ---------
 fancy_hist <- ggplot(data = mpg, aes(cty))  +
   geom_histogram(binwidth = 1, colour = "blue", fill = "blue") +
   ggtitle("Fig. 5: Smaller bins")
 
-#print(fancy_hist)
+fancy_hist
 
 # Scatter: coordinate systems --------------------------------------------------------------
 
@@ -91,7 +88,7 @@ fancy_hist <- ggplot(data = mpg, aes(cty))  +
 log_plot <- simple_plot +
   scale_y_log10() + # Plot y on log10 scale
   labs(x = "mpg, city", y = "mpg, hwy", title = "Fig. 6: Log Plot") 
-#print(log_plot)
+print(log_plot)
 
 # Scatter: point styles --------------------------------------------------------------
 
@@ -107,7 +104,7 @@ dot_plot <- ggplot(data = mpg, aes(x=cty, y=hwy)) +
   theme_classic() + # no fill
   labs(x = "mpg, city", y = "mpg, hwy", title = "Fig. 7: Point size 0.5 with 0.25 transparency")
 
-#print(dot_plot)
+print(dot_plot)
 
 # Scatter: varying point color by another variable -----------
 
@@ -131,20 +128,22 @@ iris_identity <- ggplot(iris) +
   labs(title = "Fig. 9: Colors created to span a set of specified colors")
 
 iris_identity
-# Fig 9 ---------
+
+
+# Fig 10 ---------
 # based on answers from stackoverflow, adapting to scatter data
-
-mybreaks <- c(0,3,6,Inf) # bins
-mylabels <- c("≤ 3", "3 - 6", "> 6", "") # null added at end to avoid warning about labels and breaks being same length
-
+p2<- ggplot(iris, aes(x=Sepal.Width,y=Sepal.Length,fill=cut(Petal.Length, c(0,3,6,Inf)))) +
   geom_tile() +
+  scale_fill_brewer(type="seq",palette = "YlGn") + # colors based on a yellow-green palette
+  guides(fill=guide_legend(title="Petal Length")) +
   labs(title = "Fig. 10: Discrete color series created from the Yellow-Green palette")
-  labs(title = "Fig. 9: Discrete color series created from the Yellow-Green palette")
 
-print(p2)
+p2
 
 # Giving names to the breaks and labels
-# Fig 10 --------
+# Fig 11 --------
+mybreaks <- c(0,3,6,Inf) # bins
+mylabels <- c("≤ 3", "3 - 6", "> 6") # null added at end to avoid warning about labels and breaks being same length
 
 p3 <- ggplot(iris) +
   geom_point(aes(x=Sepal.Width, y=Sepal.Length,
@@ -153,8 +152,6 @@ p3 <- ggplot(iris) +
   scale_colour_brewer("Petal Length", type="seq",palette = "YlGn", labels = mylabels, guide = "legend") +
   labs(title = "Fig. 11: Scatterplot with color change at specified breaks in data")
 
-print(p3)
-
-#TODO: AARRGH THE LEGENDS DISAPPEARED FROM 9 AND 10!!!
+p3
 
 
