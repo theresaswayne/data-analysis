@@ -123,14 +123,14 @@ print(iris_plot)
 
 # Fig 9 -----------
 # colors from specified gradient end/middle points
-# iris_identity <- ggplot(iris) + 
-#   geom_point(aes(x=Sepal.Width, y=Sepal.Length,
-#                  colour=bincol(Petal.Length,"blue","yellow","red")), size=4) +
-#   scale_color_identity("Petal.Length", labels=labels, 
-#                        breaks=breaks, guide="legend") +
-#   labs(title = "Fig. 9: Colors created to span a set of specified colors")
-# 
-# iris_identity
+iris_identity <- ggplot(iris) + 
+  geom_point(aes(x=Sepal.Width, y=Sepal.Length,
+                 colour=bincol(Petal.Length,"blue","yellow","red")), size=4) +
+  scale_color_identity("Petal.Length", labels=labels, 
+                       breaks=breaks, guide="legend") +
+  labs(title = "Fig. 9: Colors created to span a set of specified colors")
+
+iris_identity
 # Fig 9 ---------
 # based on answers from stackoverflow, adapting to scatter data
 
