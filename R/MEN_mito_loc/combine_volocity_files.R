@@ -14,7 +14,7 @@ require(purrr) # for reduce and map functions
 
 # ENTER FOLDER NAME HERE ----------
 # NOTE -- assumes everything is in a directory called "data" in the project home
-subfolder <- "2019-01-03 measurements"
+subfolder <- "2019-01-03 and 04 meas"
 
 # Read all the files in the folder ------
 
@@ -24,13 +24,15 @@ outputFolder <- here("data")
 # get file names
 files <- dir(inputFolder, pattern = "*.csv") 
 
-
-mergedDataWithNames <- data_frame(filename = files) %>% # dataframe holding file names
+# tibble is used because of the warning that data_frame is deprecated.
+mergedDataWithNames <- tibble(filename = files) %>% # tibble holding file names
   mutate(file_contents =
            map(filename,          # read files into a new data column
                ~ read_csv(file.path(inputFolder, .),
                           locale = locale(encoding = "latin1"),
-                          na = c("", "N/A"))))
+                          na = c("", "N/A"),
+                          col_types = cols(`Number of contained Mito` = col_double(),
+                                           `Compartment Whole cells ID` = col_double()))))
 
 # unnest to make the list into a flat file again,
 # but it now has 1 extra column to hold the filename
