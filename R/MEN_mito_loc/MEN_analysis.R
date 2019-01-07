@@ -29,16 +29,48 @@ hist(green_bg)
 permT <- filter(df, grepl("25C", `filename`))
 restrT <- filter(df, grepl("36C", `filename`))
 
-# group by cell
+# for each cell:
 
-# for each cell calculate in green DCI channel:
-#   get background (ROIs column)
+#  TODO:  get background in green DCI channel (ROIs population) ---------
+
+# Pull out mitos, group by filename THEN BY Whole Cell
+
+# group_by(a, b) gives you the b's as subgroups within each a
+# mfr_yr <- mpg %>% group_by(manufacturer, year) %>% summarise(city = mean(cty))
+
+permT_mito <- permT %>% filter(Population == "Mito") %>% 
+  group_by(filename, `Compartment Whole cells ID`)
+
+restrT_mito <- restrT %>% filter(Population == "Mito") %>% 
+  group_by(filename, `Compartment Whole cells ID`)
+
 #   mito intden = (sum of mito Sums) - (background * voxel count)
 #     where voxel count = volume µm3 / voxel size L x W x D
+
+# uncorrected mito intden
+
+# TODO: understand why some of the rows (one per file) do not have a whole cell ID
+raw_mito_intden_P <- permT_mito %>%
+  summarise(RawMitoIntden = sum(`Sum (roGFP 470 (DCI: 60 its, roGFP 470))`))
+
+raw_mito_intden_R <- restrT_mito %>%
+  summarise(RawMitoIntden = sum(`Sum (roGFP 470 (DCI: 60 its, roGFP 470))`))
+
+
 #   cell intden = Whole Cell Sum - (background * voxel count)
+
+# uncorrected cell intden
+raw_cell_intden_P <- filter(permT, Population == "Whole cells") %>% 
+  select(c(filename,`Sum (roGFP 470 (DCI: 60 its, roGFP 470))`))
+
+raw_cell_intden_R <- filter(restrT, Population == "Whole cells") %>% 
+  select(c(filename,`Sum (roGFP 470 (DCI: 60 its, roGFP 470))`))
+
+# TODO: understand why there are many more rows in the cell list than in the mito summary
+
+
 #   fxn in mito = mito intden/cell intden
-
 # for all cells: tabulate all fxn in mito
-
 # TODO: get voxel size (or in future, count) so we can subtract background from every pixel!
+# TODO: correct miot and cell measurements for background
 
