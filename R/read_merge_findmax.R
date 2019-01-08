@@ -6,10 +6,10 @@
 #  -- for each image, finds the row with the maximum mean fluorescence and writes that to a new data frame
 #  -- saves the maxima to a file
 
-library(purrr) # for reduce and map functions
-library(readr) # for read_csv
-library(dplyr) # for mutate, data_frame
-library(tidyr) # for unnest
+require(purrr) # for reduce and map functions
+require(readr) # for read_csv
+require(dplyr) # for mutate, data_frame
+require(tidyr) # for unnest
 
 inputFolder <- "./input/"      # path to folder that holds multiple .csv files
 outputFolder <- "./output/"

@@ -44,4 +44,8 @@ mergedDataFlat <- unnest(mergedDataWithNames)
 df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>%
   select(-contains("Trans"))
 
+# Write an output file of all the merged data ----------
+
+outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
+write_csv(df,file.path(outputFolder, outputFile))
 
