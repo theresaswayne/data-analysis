@@ -38,11 +38,14 @@ mergedDataWithNames <- tibble(filename = files) %>% # tibble holding file names
 # but it now has 1 extra column to hold the filename
 mergedDataFlat <- unnest(mergedDataWithNames)
 
+# mergedDataWithNames has correctly, 49 entries (1 per file)
 
 # Simplify -------
 
 df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>%
-  select(-contains("Trans"))
+  select(-contains("Trans")) %>%
+  arrange(filename,ID)
+
 
 # Write an output file of all the merged data ----------
 

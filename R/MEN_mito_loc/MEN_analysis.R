@@ -72,5 +72,5 @@ raw_cell_intden_R <- filter(restrT, Population == "Whole cells") %>%
 #   fxn in mito = mito intden/cell intden
 # for all cells: tabulate all fxn in mito
 # TODO: get voxel size (or in future, count) so we can subtract background from every pixel!
-# TODO: correct miot and cell measurements for background
+# TODO: correct mito and cell measurements for background
 
