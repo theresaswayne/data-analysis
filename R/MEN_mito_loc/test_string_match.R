@@ -1,8 +1,7 @@
 # test_string_match.R
 # testing retrieval of factors from filename text
 
-require(dplyr)
-require(stringr)
+require(tidyverse)
 
 filename <- c("GTY029 25C 2 (cropped)_01_c10m-80.csv",
               "GTY029 25C 6 (cropped)_03_c50m-50.csv",
@@ -12,4 +11,10 @@ verify <- c(-80, -50, 200) # ground truth
 
 tbl <- cbind(filename, verify) %>% as_tibble()
 
-captured <- str_extract(filename, m(.*)\.csv)
+# note R uses ICU-style regex, not compatible with regex101.com
+
+myexp <- "m([:graph:]+)\\.csv" # any letter/number/punc characters between m and .csv
+
+matched <- str_match(filename, myexp)
+
+new_tbl <- mutate(tbl, thresh = matched[,2])
