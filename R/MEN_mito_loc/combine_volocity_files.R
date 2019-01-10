@@ -14,7 +14,7 @@ require(purrr) # for reduce and map functions
 
 # ENTER FOLDER NAME HERE ----------
 # NOTE -- assumes everything is in a directory called "data" in the project home
-subfolder <- "2019-01-03 and 04 meas"
+subfolder <- "2019-01-03 and 04 meas cells w mito bg roi"
 
 # Read all the files in the folder ------
 
@@ -49,6 +49,6 @@ df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>%
 
 # Write an output file of all the merged data ----------
 
-outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
-write_csv(df,file.path(outputFolder, outputFile))
+#outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
+#write_csv(df,file.path(outputFolder, outputFile))
 

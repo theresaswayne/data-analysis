@@ -7,6 +7,13 @@
 require(dplyr)
 require(here)
 require(ggplot2)
+require(stringr)
+
+# TODO: filter by thresholding ------
+# try -80, -50
+
+# 
+
 
 # 1. Collect background values ---------
 # Each file should have exactly 1 background ROI.
@@ -17,7 +24,7 @@ green_bg <- filter(df, Population == "ROIs") %>%
 
 
 # simple plots
-# Most background levels are 650-700
+# Most background levels are 650-690
 boxplot(green_bg[,2], main = "Deconvolved green channel background")
 hist(green_bg[,2] %>% unlist, main="Deconvolved green channel background")
 
@@ -87,18 +94,21 @@ frac_mito <- mito_corr/cell_corr
 
 corrected_mito_loc <- cell_mito_bkd %>% mutate(CellIntDenCorr = cell_corr, MitoIntDenCorr = mito_corr, FractionInMito = frac_mito)
 
-# 6. filter on temperature ------
+# 6. Compare results by temperature ------
 
-# and boxplot the data from #5 
-
-# group by temperature
 # TODO: convert this to a factor 
 
 permT <- filter(corrected_mito_loc, grepl("25C", `filename`))
 restrT <- filter(corrected_mito_loc, grepl("36C", `filename`))
 
-boxplot(permT$FractionInMito, ylim = c(0,1))
-boxplot(restrT$FractionInMito, ylim = c(0,1))
+# TODO: Nicer plots, paired, with labels
+
+boxplot(permT$FractionInMito, ylim = c(0,1), main = "GTY 029 Permissive Temp")
+boxplot(restrT$FractionInMito, ylim = c(0,1), main = "GTY 029 Restrictive Temp")
 
 
-# 7. write a csv file
+# 7. Save a csv table ------
+# overwrites without warning!
+
+outputFile = paste(Sys.Date(), "mito_loc.csv") # spaces will be inserted
+write_csv(corrected_mito_loc, file.path(here("data"), outputFile))
