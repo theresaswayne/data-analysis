@@ -18,3 +18,6 @@ myexp <- "m([:graph:]+)\\.csv" # any letter/number/punc characters between m and
 matched <- str_match(filename, myexp)
 
 new_tbl <- mutate(tbl, thresh = matched[,2])
+
+temp_exp <- "(\\d{2})C" # any 2 number characters before C
+matched_temp <- str_match(filename, temp_exp)

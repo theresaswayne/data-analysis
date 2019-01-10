@@ -1,16 +1,12 @@
 # combine_volocity_files.R
-# imports, merges, and simplifies a batch of csv files exported from Volocity 6.3
+# imports, merges, sorts, and simplifies a batch of csv files exported from Volocity 6.3
 # Requirement: All files must be within a single folder in the "data" folder
 
 # adapted from http://serialmentor.com/blog/2016/6/13/reading-and-combining-many-tidy-data-files-in-R
 
 # Setup -------
-require(readr)
 require(here)
-require(dplyr)
-require(tidyr) # for unnest
-require(purrr) # for reduce and map functions
-
+require(tidyverse)
 
 # ENTER FOLDER NAME HERE ----------
 # NOTE -- assumes everything is in a directory called "data" in the project home
@@ -42,9 +38,9 @@ mergedDataFlat <- unnest(mergedDataWithNames)
 
 # Simplify -------
 
-df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>%
-  select(-contains("Trans")) %>%
-  arrange(filename,ID)
+df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>% # unwanted objects
+  select(-contains("Trans")) %>% # unwanted channels
+  arrange(filename,ID)  # sort rows
 
 
 # Write an output file of all the merged data ----------

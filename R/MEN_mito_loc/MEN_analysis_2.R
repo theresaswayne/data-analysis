@@ -7,10 +7,7 @@
 require(tidyverse)
 require(here)
 
-# TODO: filter by thresholding ------
-# try -80, -50
 
-# 
 
 
 # 1. Collect background values ---------
@@ -94,16 +91,47 @@ corrected_mito_loc <- cell_mito_bkd %>% mutate(CellIntDenCorr = cell_corr, MitoI
 
 # 6. Compare results by temperature ------
 
-# TODO: convert this to a factor 
+# TODO: filter by thresholding ------
+# try -80, -50
 
-permT <- filter(corrected_mito_loc, grepl("25C", `filename`))
-restrT <- filter(corrected_mito_loc, grepl("36C", `filename`))
 
-# TODO: Nicer plots, paired, with labels
+mito_thresh_exp <- "m([:graph:]+)\\.csv" # any letter/number/punc characters between m and .csv
 
-boxplot(permT$FractionInMito, ylim = c(0,1), main = "GTY 029 Permissive Temp")
-boxplot(restrT$FractionInMito, ylim = c(0,1), main = "GTY 029 Restrictive Temp")
+mito_thresh <- str_match(corrected_mito_loc$filename, mito_thresh_exp)
 
+
+temp_exp <- "(\\d{2})C" # any 2 number characters before C
+
+temp <- str_match(corrected_mito_loc$filename, temp_exp)
+
+corrected_mito_loc <- corrected_mito_loc  %>%
+  mutate(MitoThresh = mito_thresh[,2]) %>%
+  mutate(Temp = temp[,2])
+
+#permT <- filter(corrected_mito_loc, grepl("25C", `filename`))
+#restrT <- filter(corrected_mito_loc, grepl("36C", `filename`))
+
+#boxplot(permT$FractionInMito, ylim = c(0,1), main = "GTY 029 Permissive Temp")
+#boxplot(restrT$FractionInMito, ylim = c(0,1), main = "GTY 029 Restrictive Temp")
+
+# all data by temp
+boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$Temp, main = "All mito threshold offsets")
+
+# effect of mito threshold (confounded with temp)
+boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$MitoThresh)
+
+mito50 <- corrected_mito_loc %>% filter(MitoThresh == "-50")
+mito80 <- corrected_mito_loc %>% filter(MitoThresh == "-80")
+
+boxplot(mito50$FractionInMito ~ mito50$Temp, main = "Frac MEN in mito, threshold offset -50")
+boxplot(mito80$FractionInMito ~ mito80$Temp, main = "Frac MEN in mito, threshold offset -80")
+
+# frac/mito values tend to be higher with -80 offset, volumes tend to be higher and much more variable (n=60)
+
+boxplot(mito50$MitoVolume_um3 ~ mito50$Temp, main = "Volume, Mito threshold offset -50", ylim = c(0,70))
+boxplot(mito80$MitoVolume_um3 ~ mito80$Temp, main = "Volume, Mito threshold offset -80", ylim = c(0,70))
+
+# thresh of -80 seems to show more of a diff but there are too few cells (8) in the 36C category and some of them have much higher mito volume
 
 # 7. Save a csv table ------
 # overwrites without warning!
