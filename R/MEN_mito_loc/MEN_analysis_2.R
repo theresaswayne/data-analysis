@@ -89,12 +89,30 @@ frac_mito <- mito_corr/cell_corr
 
 corrected_mito_loc <- cell_mito_bkd %>% mutate(CellIntDenCorr = cell_corr, MitoIntDenCorr = mito_corr, FractionInMito = frac_mito)
 
-# 6. Compare results by temperature ------
 
-# TODO: filter by thresholding ------
-# try -80, -50
+# Compare mean GFP in mitos across temperatures ------
+# mean per cell = (sum/voxel count) - background
 
 
+mean_per_cell <- function (rawintden, 
+                           vol,
+                           background,
+                           voxsize) {
+  # determines mean intensity per voxel and subtracts background 
+  (rawintden * voxsize/vol) - background # return value
+}
+
+mito_mean_corr <- mean_per_cell(corrected_mito_loc$RawMitoIntden,
+                                corrected_mito_loc$MitoVolume_um3,
+                                corrected_mito_loc$MeanBackground,
+                                voxel_size)
+
+
+corrected_mito_loc <- corrected_mito_loc %>% mutate(MitoMeanCorr = mito_mean_corr)
+
+
+
+# Compare results by temperature ------
 mito_thresh_exp <- "m([:graph:]+)\\.csv" # any letter/number/punc characters between m and .csv
 
 mito_thresh <- str_match(corrected_mito_loc$filename, mito_thresh_exp)
@@ -108,11 +126,6 @@ corrected_mito_loc <- corrected_mito_loc  %>%
   mutate(MitoThresh = mito_thresh[,2]) %>%
   mutate(Temp = temp[,2])
 
-#permT <- filter(corrected_mito_loc, grepl("25C", `filename`))
-#restrT <- filter(corrected_mito_loc, grepl("36C", `filename`))
-
-#boxplot(permT$FractionInMito, ylim = c(0,1), main = "GTY 029 Permissive Temp")
-#boxplot(restrT$FractionInMito, ylim = c(0,1), main = "GTY 029 Restrictive Temp")
 
 # all data by temp
 boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$Temp, main = "All mito threshold offsets")
@@ -131,9 +144,23 @@ boxplot(mito80$FractionInMito ~ mito80$Temp, main = "Frac MEN in mito, threshold
 boxplot(mito50$MitoVolume_um3 ~ mito50$Temp, main = "Volume, Mito threshold offset -50", ylim = c(0,70))
 boxplot(mito80$MitoVolume_um3 ~ mito80$Temp, main = "Volume, Mito threshold offset -80", ylim = c(0,70))
 
-# thresh of -80 seems to show more of a diff but there are too few cells (8) in the 36C category and some of them have much higher mito volume
+# for intden, thresh of -80 seems to show more of a diff but there are too few cells (8) in the 36C category and some of them have much higher mito volume
 
-# 7. Save a csv table ------
+# for mean, thresh of -50 shows more diff
+
+boxplot(mito50$MitoMeanCorr ~ mito50$Temp, main = "Mean GFP in mito, Mito threshold offset -50")
+boxplot(mito80$MitoMeanCorr ~ mito80$Temp, main = "Mean GFP in mito, Mito threshold offset -80")
+
+boxplot(corrected_mito_loc$MitoMeanCorr ~ corrected_mito_loc$Temp, main = "Mean corrected mito GFP, all threshold offsets")
+
+
+# Compare total cell GFP across temperatures
+
+boxplot(corrected_mito_loc$CellIntDenCorr ~ corrected_mito_loc$Temp, main = "Total corrected cell GFP, all threshold offsets")
+
+
+
+# Save csv table ------
 # overwrites without warning!
 
 outputFile = paste(Sys.Date(), "mito_loc.csv") # spaces will be inserted
