@@ -45,6 +45,6 @@ df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>% # unwanted 
 
 # Write an output file of all the merged data ----------
 
-#outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
-#write_csv(df,file.path(outputFolder, outputFile))
+outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
+write_csv(df,file.path(outputFolder, outputFile))
 
