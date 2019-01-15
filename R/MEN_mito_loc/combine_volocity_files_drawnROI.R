@@ -1,4 +1,4 @@
-# combine_volocity_files.R
+# combine_volocity_files_drawnROI.R
 # imports, merges, sorts, and simplifies a batch of csv files exported from Volocity 6.3
 # Requirement: All files must be within a single folder in the "data" folder
 
@@ -30,7 +30,7 @@ mergedDataWithNames <- tibble(filename = files) %>% # tibble holding file names
                           locale = locale(encoding = "latin1"),
                           na = c("", "N/A"),
                           col_types = cols(`Number of contained Mito` = col_double(),
-                                           `Compartment Whole cells ID` = col_double()))))
+                                           `Compartment ROIs ID` = col_double()))))
 
 # unnest to make the list into a flat file again,
 # but it now has 1 extra column to hold the filename
