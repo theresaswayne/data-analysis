@@ -17,12 +17,11 @@ require(here)
 
 green_bg <- filter(df, Population == "ROIs") %>%
   group_by(filename) %>%
-  filter(`Volume (µm³)` == min(`Volume (µm³)`)) %>% # smaller ROI for each file 
-  select(filename, MeanBackground = `Mean (roGFP 470 (DCI: 60 its, roGFP 470))`)
-
+  filter(`Volume (µm³)` == min(`Volume (µm³)`)) %>% # take the smaller ROI from each file 
+  select(filename, MeanBackground = `Mean (roGFP 470 (DCI: 60 its, roGFP 470))`) 
 
 # simple plots
-# Most background levels are 580-620
+# For 1-15 data, most background levels are 580-620
 boxplot(green_bg[,2], main = "Deconvolved green cytoplasmic background")
 hist(green_bg[,2] %>% unlist, main="Deconvolved green cytoplasmic background")
 
@@ -34,85 +33,73 @@ hist(green_bg[,2] %>% unlist, main="Deconvolved green cytoplasmic background")
   # stupid_names[7]
 
 # TODO: Update for new data ------
-# TODO: group by filename only -----
 
-all_mito <- df %>% filter(Population == "Mito") %>% 
-  drop_na(`Compartment Whole cells ID`) %>%        # eliminate mitos not belonging to a cell
-  group_by(filename, `Compartment Whole cells ID`) # will sum first by cell
+all_mito <- df %>% filter(Population == "Mito") %>%
+  group_by(filename) # mitos in a cell are grouped
 
 raw_mito_intden <- all_mito %>%
-  summarise(RawMitoIntden = sum(`Sum (roGFP 470 (DCI: 60 its, roGFP 470))`), 
-            MitoVolume_um3 = sum(`Volume (µm³)`))
+  summarise(RawMitoIntDen = sum(`Sum (roGFP 470 (DCI: 60 its, roGFP 470))`), 
+            RawMitoMean = sum(`Mean (roGFP 470 (DCI: 60 its, roGFP 470))`*`Voxel Count`)/sum(`Voxel Count`),
+            MitoVolume_um3 = sum(`Volume (µm³)`),
+            MitoVoxelCount = sum(`Voxel Count`))
 
-  # result has 4 columns
 
 # Get whole cell values -------
 
-# uncorrected cell intden, omitting cells with no mito 
-raw_cell_intden <- filter(df,
-                          Population == "Whole cells" & `Number of contained Mito` != 0) %>%
+# uncorrected cell intden
+raw_cell_intden <- df %>% filter(Population == "ROIs") %>% # cell and background ROIs
+  group_by(filename) %>%
+  filter(`Volume (µm³)` == max(`Volume (µm³)`)) %>% # take the larger ROI from each file 
   select(filename,
-         ID,
          RawCellIntDen = `Sum (roGFP 470 (DCI: 60 its, roGFP 470))`,
-         CellVolume_um3 = `Volume (µm³)`)
+         RawCellMean = `Mean (roGFP 470 (DCI: 60 its, roGFP 470))`,
+         CellVolume_um3 = `Volume (µm³)`,
+         CellVoxelCount = `Voxel Count`)
 
-# Add columns for mito sum, volume, and background ROI ------
+# Collect columns for cell, mito, and background ------
 
-cell_mito_intden <- raw_cell_intden %>% mutate(
-  RawMitoIntden = raw_mito_intden$RawMitoIntden,
-  MitoVolume_um3 = raw_mito_intden$MitoVolume_um3)
-
-  # note: can insert RawMitoCellID = raw_mito_intden$`Compartment Whole cells ID` to verify that IDs are correct
+cell_mito_intden <- raw_cell_intden %>% ungroup %>% 
+  mutate(
+  RawMitoIntDen = raw_mito_intden$RawMitoIntDen,
+  RawMitoMean = raw_mito_intden$RawMitoMean,
+  MitoVolume_um3 = raw_mito_intden$MitoVolume_um3,
+  MitoVoxelCount = raw_mito_intden$MitoVoxelCount)
 
 cell_mito_bkd <- cell_mito_intden %>% left_join(green_bg) # only common column is filename
 
-# Determine fraction of green signal in mito ----
+# Get fraction of green signal in mito ----
 
 #   corr intden = (sum) - (background * voxel count)
 #     where voxel count = volume µm3 / voxel size µm3/pixel
 
 voxel_size <- 0.0011907 #     voxel size is 0.0011907 um3
 
-bkgcorr <- function (rawintden, 
-                     vol,
-                     background,
-                     voxsize) {
+bkgcorr <- function (rawmean, 
+                     voxcount,
+                     background) {
   # subtracts background from every voxel in a volume 
-  rawintden - (background * (vol/voxsize))
+  # uses the mean rather than intden, in order to avoid truncation of sig figs by Volocity 
+  (rawmean - background) * voxcount
 }
 
-cell_corr <- bkgcorr(cell_mito_bkd$RawCellIntDen,
-                     cell_mito_bkd$CellVolume_um3,
-                     cell_mito_bkd$MeanBackground,
-                     voxel_size)
+cell_corr <- bkgcorr(cell_mito_bkd$RawCellMean,
+                     cell_mito_bkd$CellVoxelCount,
+                     cell_mito_bkd$MeanBackground)
 
-mito_corr <- bkgcorr(cell_mito_bkd$RawMitoIntden,
-                     cell_mito_bkd$MitoVolume_um3,
-                     cell_mito_bkd$MeanBackground,
-                     voxel_size)
+mito_corr <- bkgcorr(cell_mito_bkd$RawMitoMean,
+                     cell_mito_bkd$MitoVoxelCount,
+                     cell_mito_bkd$MeanBackground)
 
 frac_mito <- mito_corr/cell_corr
 
 corrected_mito_loc <- cell_mito_bkd %>% mutate(CellIntDenCorr = cell_corr, MitoIntDenCorr = mito_corr, FractionInMito = frac_mito)
 
 
-# Determine weighted mean GFP in mitos  ------
+# Get weighted mean GFP in mitos  ------
 # mean per cell = (sum/voxel count) - background
 
 
-mean_per_cell <- function (rawintden, 
-                           vol,
-                           background,
-                           voxsize) {
-  # determines mean intensity per voxel and subtracts background 
-  (rawintden * voxsize/vol) - background # return value
-}
-
-mito_mean_corr <- mean_per_cell(corrected_mito_loc$RawMitoIntden,
-                                corrected_mito_loc$MitoVolume_um3,
-                                corrected_mito_loc$MeanBackground,
-                                voxel_size)
-
+mito_mean_corr <- corrected_mito_loc$RawMitoMean - corrected_mito_loc$MeanBackground
 
 corrected_mito_loc <- corrected_mito_loc %>% mutate(MitoMeanCorr = mito_mean_corr)
 
@@ -143,31 +130,14 @@ boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$Temp, main = "All
 # effect of mito threshold (confounded with temp)
 boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$MitoThresh, main = "Fraction of MEN in mito, by threshold offset")
 
-mito50 <- corrected_mito_loc %>% filter(MitoThresh == "-50")
-mito80 <- corrected_mito_loc %>% filter(MitoThresh == "-80")
-
-boxplot(mito50$FractionInMito ~ mito50$Temp, main = "Frac MEN in mito, threshold offset -50")
-boxplot(mito80$FractionInMito ~ mito80$Temp, main = "Frac MEN in mito, threshold offset -80")
-
-# frac/mito values tend to be higher with -80 offset, volumes tend to be higher and much more variable (n=60)
-
-boxplot(mito50$MitoVolume_um3 ~ mito50$Temp, main = "Volume, Mito threshold offset -50", ylim = c(0,70))
-boxplot(mito80$MitoVolume_um3 ~ mito80$Temp, main = "Volume, Mito threshold offset -80", ylim = c(0,70))
-
-# for intden, thresh of -80 seems to show more of a diff but there are too few cells (8) in the 36C category and some of them have much higher mito volume
-
-# for mean, thresh of -50 shows more diff
-
-boxplot(mito50$MitoMeanCorr ~ mito50$Temp, main = "Mean GFP in mito, Mito threshold offset -50")
-boxplot(mito80$MitoMeanCorr ~ mito80$Temp, main = "Mean GFP in mito, Mito threshold offset -80")
-
-boxplot(corrected_mito_loc$MitoMeanCorr ~ corrected_mito_loc$Temp, main = "Mean corrected mito GFP, all threshold offsets")
+boxplot(corrected_mito_loc$MitoMeanCorr ~ corrected_mito_loc$Temp, main = "Mean GFP in mito")
 
 
 # Compare total cell GFP across temperatures
 
-boxplot(corrected_mito_loc$CellIntDenCorr ~ corrected_mito_loc$Temp, main = "Total corrected cell GFP, all threshold offsets")
+boxplot(corrected_mito_loc$CellIntDenCorr ~ corrected_mito_loc$Temp, main = "Total corrected cell GFP")
 
+plot(corrected_mito_loc$CellIntDenCorr, corrected_mito_loc$CellVolume_um3)
 
 # TODO: reduce the number of data frames by gradually adding to a single output table
 
