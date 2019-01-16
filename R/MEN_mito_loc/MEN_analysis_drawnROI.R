@@ -11,19 +11,20 @@ require(here)
 
 
 # Get background values ---------
-# Each file should have exactly 1 background ROI.
-# (filter for Population == ROIs, select filename, 470DCI columns)
-
-# TODO: There are 2 ROIs now, so select the smaller one -----
+# NOTE these are intracellular background levels
+# Each file has exactly 2 ROIs, the cell and the background.
+# Background ROI is always smaller.
 
 green_bg <- filter(df, Population == "ROIs") %>%
+  group_by(filename) %>%
+  filter(`Volume (µm³)` == min(`Volume (µm³)`)) %>% # smaller ROI for each file 
   select(filename, MeanBackground = `Mean (roGFP 470 (DCI: 60 its, roGFP 470))`)
 
 
 # simple plots
-# Most background levels are 650-690
-boxplot(green_bg[,2], main = "Deconvolved green channel background")
-hist(green_bg[,2] %>% unlist, main="Deconvolved green channel background")
+# Most background levels are 580-620
+boxplot(green_bg[,2], main = "Deconvolved green cytoplasmic background")
+hist(green_bg[,2] %>% unlist, main="Deconvolved green cytoplasmic background")
 
 
 # Summarize mito values -----
@@ -32,6 +33,7 @@ hist(green_bg[,2] %>% unlist, main="Deconvolved green channel background")
   # stupid_names <- colnames(df)
   # stupid_names[7]
 
+# TODO: Update for new data ------
 # TODO: group by filename only -----
 
 all_mito <- df %>% filter(Population == "Mito") %>% 

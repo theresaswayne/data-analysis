@@ -1,6 +1,7 @@
 # combine_volocity_files_drawnROI.R
 # imports, merges, sorts, and simplifies a batch of csv files exported from Volocity 6.3
-# Requirement: All files must be within a single folder in the "data" folder
+
+# REQUIREMENT: All files must be within a single folder in the "data" folder in the project home
 
 # adapted from http://serialmentor.com/blog/2016/6/13/reading-and-combining-many-tidy-data-files-in-R
 
@@ -9,7 +10,7 @@ require(here)
 require(tidyverse)
 
 # ENTER FOLDER NAME HERE ----------
-# NOTE -- assumes everything is in a directory called "data" in the project home
+# REQUIREMENT: All files must be within a single folder in the "data" folder in the project home
 
 # TODO: update to allow user to select folder
 subfolder <- "2019-01-15 test analysis TCS"
@@ -47,6 +48,6 @@ df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>% # unwanted 
 
 # Write an output file of all the merged data ----------
 
-outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
-write_csv(df,file.path(outputFolder, outputFile))
+#outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
+#write_csv(df,file.path(outputFolder, outputFile))
 
