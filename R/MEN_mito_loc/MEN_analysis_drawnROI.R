@@ -20,6 +20,14 @@ green_bg <- filter(df, Population == "ROIs") %>%
   filter(`Volume (µm³)` == min(`Volume (µm³)`)) %>% # take the smaller ROI from each file 
   select(filename, MeanBackground = `Mean (roGFP 470 (DCI: 60 its, roGFP 470))`) 
 
+# additional background column
+# Kludge alert 
+# ENTER BACKGROUND FILENAME HERE ---
+xcell_bg <-  X2019_01_15_extracellular_background
+boxplot(xcell_bg[,2], main = "Deconvolved green extracellular background")
+hist(xcell_bg[,2] %>% unlist, main="Deconvolved green extracellular background")
+
+
 # simple plots
 # For 1-15 data, most background levels are 580-620
 boxplot(green_bg[,2], main = "Deconvolved green cytoplasmic background")
@@ -67,6 +75,8 @@ cell_mito_intden <- raw_cell_intden %>% ungroup %>%
 
 cell_mito_bkd <- cell_mito_intden %>% left_join(green_bg) # only common column is filename
 
+cell_mito_xc_bkd <- cell_mito_intden %>% left_join(xcell_bg) # only common column is filename
+
 # Get fraction of green signal in mito ----
 
 #   corr intden = (sum) - (background * voxel count)
@@ -82,6 +92,7 @@ bkgcorr <- function (rawmean,
   (rawmean - background) * voxcount
 }
 
+# correcting with intracellular bkgd -----
 cell_corr <- bkgcorr(cell_mito_bkd$RawCellMean,
                      cell_mito_bkd$CellVoxelCount,
                      cell_mito_bkd$MeanBackground)
@@ -94,15 +105,31 @@ frac_mito <- mito_corr/cell_corr
 
 corrected_mito_loc <- cell_mito_bkd %>% mutate(CellIntDenCorr = cell_corr, MitoIntDenCorr = mito_corr, FractionInMito = frac_mito)
 
-
 # Get weighted mean GFP in mitos  ------
 # mean per cell = (sum/voxel count) - background
-
-
 mito_mean_corr <- corrected_mito_loc$RawMitoMean - corrected_mito_loc$MeanBackground
 
 corrected_mito_loc <- corrected_mito_loc %>% mutate(MitoMeanCorr = mito_mean_corr)
 
+# correcting with extracellular bkgd -------
+
+cell_corr <- bkgcorr(cell_mito_xc_bkd$RawCellMean,
+                     cell_mito_xc_bkd$CellVoxelCount,
+                     cell_mito_xc_bkd$ExtracellularBackground)
+
+mito_corr <- bkgcorr(cell_mito_xc_bkd$RawMitoMean,
+                     cell_mito_xc_bkd$MitoVoxelCount,
+                     cell_mito_xc_bkd$ExtracellularBackground)
+
+frac_mito <- mito_corr/cell_corr
+# 
+corrected_mito_loc_xc <- cell_mito_xc_bkd %>% mutate(CellIntDenCorr = cell_corr, MitoIntDenCorr = mito_corr, FractionInMito = frac_mito)
+
+# Get weighted mean GFP in mitos  ------
+# mean per cell = (sum/voxel count) - background
+mito_mean_corr <- corrected_mito_loc_xc$RawMitoMean - corrected_mito_loc_xc$ExtracellularBackground
+
+corrected_mito_loc_xc <- corrected_mito_loc_xc %>% mutate(MitoMeanCorr = mito_mean_corr)
 
 
 # Compare results by temperature and threshold offset ------
@@ -124,20 +151,44 @@ corrected_mito_loc <- corrected_mito_loc  %>%
   mutate(Temp = temp[,2])
 
 
+# extract the threshold offset from the filename 
+
+mito_thresh_exp <- "m([:graph:]+)\\.csv" # any letter/number/punc characters between m and .csv
+
+mito_thresh <- str_match(corrected_mito_loc_xc$filename, mito_thresh_exp)
+
+# extract the temperature from the filename 
+
+temp_exp <- "(\\d{2})C" # any 2 number characters before C
+
+temp <- str_match(corrected_mito_loc_xc$filename, temp_exp)
+
+corrected_mito_loc_xc <- corrected_mito_loc_xc  %>%
+  mutate(MitoThresh = mito_thresh[,2]) %>%
+  mutate(Temp = temp[,2])
+
+
 # all data by temp
-boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$Temp, main = "All mito threshold offsets")
+boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$Temp, main = "All mito threshold offsets, cyto bkgd")
+
+boxplot(corrected_mito_loc_xc$FractionInMito ~ corrected_mito_loc_xc$Temp, main = "All mito threshold offsets, xc bkgd")
 
 # effect of mito threshold (confounded with temp)
-boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$MitoThresh, main = "Fraction of MEN in mito, by threshold offset")
+#boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$MitoThresh, main = "Fraction of MEN in mito, by threshold offset")
 
-boxplot(corrected_mito_loc$MitoMeanCorr ~ corrected_mito_loc$Temp, main = "Mean GFP in mito")
+boxplot(corrected_mito_loc$MitoMeanCorr ~ corrected_mito_loc$Temp, main = "Mean GFP in mito, cyto bkgd")
 
+boxplot(corrected_mito_loc_xc$MitoMeanCorr ~ corrected_mito_loc_xc$Temp, main = "Mean GFP in mito, xc bkgd")
 
 # Compare total cell GFP across temperatures
 
-boxplot(corrected_mito_loc$CellIntDenCorr ~ corrected_mito_loc$Temp, main = "Total corrected cell GFP")
+boxplot(corrected_mito_loc$CellIntDenCorr ~ corrected_mito_loc$Temp, main = "Total corrected cell GFP, cyto bkgd")
 
-plot(corrected_mito_loc$CellIntDenCorr, corrected_mito_loc$CellVolume_um3)
+plot(corrected_mito_loc$CellIntDenCorr, corrected_mito_loc$CellVolume_um3, main = "Cyto Bkgd")
+
+boxplot(corrected_mito_loc_xc$CellIntDenCorr ~ corrected_mito_loc_xc$Temp, main = "Total corrected cell GFP, xc bkgd")
+
+plot(corrected_mito_loc_xc$CellIntDenCorr, corrected_mito_loc_xc$CellVolume_um3, main = "XC Bkgd")
 
 # TODO: reduce the number of data frames by gradually adding to a single output table
 
@@ -146,5 +197,9 @@ plot(corrected_mito_loc$CellIntDenCorr, corrected_mito_loc$CellVolume_um3)
 # Save csv table ------
 # overwrites without warning!
 
-outputFile = paste(Sys.Date(), "mito_loc.csv") # spaces will be inserted
-write_csv(corrected_mito_loc, file.path(here("data"), outputFile))
+outputFile1 = paste(Sys.Date(), "mito_loc.csv") # spaces will be inserted
+outputFile2 = paste(Sys.Date(), "mito_loc_xc.csv") # spaces will be inserted
+
+# write_csv(corrected_mito_loc, file.path(here("data"), outputFile1))
+# write_csv(corrected_mito_loc_xc, file.path(here("data"), outputFile2))
+
