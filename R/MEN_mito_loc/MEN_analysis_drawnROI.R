@@ -169,12 +169,9 @@ corrected_mito_loc_xc <- corrected_mito_loc_xc  %>%
 
 
 # all data by temp
-boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$Temp, main = "All mito threshold offsets, cyto bkgd")
+boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$Temp, main = "Fraction of GFP in mito, cyto bkgd")
 
-boxplot(corrected_mito_loc_xc$FractionInMito ~ corrected_mito_loc_xc$Temp, main = "All mito threshold offsets, xc bkgd")
-
-# effect of mito threshold (confounded with temp)
-#boxplot(corrected_mito_loc$FractionInMito ~ corrected_mito_loc$MitoThresh, main = "Fraction of MEN in mito, by threshold offset")
+boxplot(corrected_mito_loc_xc$FractionInMito ~ corrected_mito_loc_xc$Temp, main = "Fraction of GFP in mito, xc bkgd")
 
 boxplot(corrected_mito_loc$MitoMeanCorr ~ corrected_mito_loc$Temp, main = "Mean GFP in mito, cyto bkgd")
 
@@ -182,17 +179,49 @@ boxplot(corrected_mito_loc_xc$MitoMeanCorr ~ corrected_mito_loc_xc$Temp, main = 
 
 # Compare total cell GFP across temperatures
 
+# is total cellular GFP constant with temp?
 boxplot(corrected_mito_loc$CellIntDenCorr ~ corrected_mito_loc$Temp, main = "Total corrected cell GFP, cyto bkgd")
 
-plot(corrected_mito_loc$CellIntDenCorr, corrected_mito_loc$CellVolume_um3, main = "Cyto Bkgd")
+# cell intden vs volume
+#plot(corrected_mito_loc$CellIntDenCorr, corrected_mito_loc$CellVolume_um3, main = "Cyto Bkgd")
 
+# is total cellular GFP constant with temp?
 boxplot(corrected_mito_loc_xc$CellIntDenCorr ~ corrected_mito_loc_xc$Temp, main = "Total corrected cell GFP, xc bkgd")
 
-plot(corrected_mito_loc_xc$CellIntDenCorr, corrected_mito_loc_xc$CellVolume_um3, main = "XC Bkgd")
+# cell intden vs volume
+#plot(corrected_mito_loc_xc$CellIntDenCorr, corrected_mito_loc_xc$CellVolume_um3, main = "XC Bkgd")
 
 # TODO: reduce the number of data frames by gradually adding to a single output table
 
 # TODO: Add n to the labels for the plots (for each group)
+
+# Statistical tests -----
+
+permTfrac <- corrected_mito_loc_xc %>% 
+  filter(Temp == 25) %>% 
+  select(FractionInMito) %>%
+  unlist
+
+restrTfrac <- corrected_mito_loc_xc %>% 
+  filter(Temp == 36) %>% 
+  select(FractionInMito) %>%
+  unlist
+
+permTmean <- corrected_mito_loc_xc %>% 
+  filter(Temp == 25) %>% 
+  select(MitoMeanCorr) %>%
+  unlist
+
+restrTmean <- corrected_mito_loc_xc %>% 
+  filter(Temp == 36) %>% 
+  select(MitoMeanCorr) %>%
+  unlist
+
+frac_wilcoxon <- wilcox.test(permTfrac, restrTfrac)
+mean_wilcoxon <- wilcox.test(permTmean, restrTmean)
+
+frac_t <- t.test(permTfrac, restrTfrac)
+mean_t <- t.test(permTmean, restrTmean)
 
 # Save csv table ------
 # overwrites without warning!
