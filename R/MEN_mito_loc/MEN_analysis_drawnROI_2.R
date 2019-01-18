@@ -139,9 +139,9 @@ corrected_mito_loc_xc <- corrected_mito_loc_xc  %>%
 
 # all data by temp
 
-boxplot(corrected_mito_loc_xc$FractionInMito ~ corrected_mito_loc_xc$Temp, main = "Fraction of GFP in mito, xc bkgd") # whiskers extend to 1.5x interquartile range
+boxplot(corrected_mito_loc_xc$FractionInMito ~ corrected_mito_loc_xc$Temp, main = "Fraction of GFP integrated density in mitochondria, GTY030") # whiskers extend to 1.5x interquartile range
 
-boxplot(corrected_mito_loc_xc$MitoMeanCorr ~ corrected_mito_loc_xc$Temp, main = "Mean GFP in mito, xc bkgd")
+boxplot(corrected_mito_loc_xc$MitoMeanCorr ~ corrected_mito_loc_xc$Temp, main = "Mean GFP intensity in mitochondria, GTY030")
 
 # Compare total cell GFP across temperatures
 
@@ -199,11 +199,15 @@ hist(testdata)
 qqnorm(testdata)
 testdata_shapiro <- shapiro.test(testdata)$p.value
 
+wilcoxon_frac <- wilcox.test(permTfrac, restrTfrac)$p.value
+wilcoxon_mean <- wilcox.test(permTmean, restrTmean)$p.value
 
-frac_wilcoxon <- wilcox.test(permTfrac, restrTfrac)
-mean_wilcoxon <- wilcox.test(permTmean, restrTmean)
+mean_25_frac <- mean(permTfrac)
+mean_36_frac <- mean(restrTfrac)
+mean_25_mean <- mean(permTmean)
+mean_36_mean <- mean(restrTmean)
 
-# do not use for non-normal data
+# do not use t-test for non-normally distributed data
 # frac_t <- t.test(permTfrac, restrTfrac)
 # mean_t <- t.test(permTmean, restrTmean)
 
