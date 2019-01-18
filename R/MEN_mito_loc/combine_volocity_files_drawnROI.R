@@ -13,7 +13,7 @@ require(tidyverse)
 # REQUIREMENT: All files must be within a single folder in the "data" folder in the project home
 
 # TODO: update to allow user to select folder
-subfolder <- "2019-01-15 test analysis TCS"
+subfolder <- file.path("2019-01-18 analysis HK", "cells")
 
 # Read all the files in the folder ------
 
@@ -37,8 +37,6 @@ mergedDataWithNames <- tibble(filename = files) %>% # tibble holding file names
 # but it now has 1 extra column to hold the filename
 mergedDataFlat <- unnest(mergedDataWithNames)
 
-# mergedDataWithNames has correctly, 49 entries (1 per file)
-
 # Simplify -------
 
 df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>% # unwanted objects
@@ -48,6 +46,6 @@ df <- filter(mergedDataFlat, Population != "Whole cells prelim") %>% # unwanted 
 
 # Write an output file of all the merged data ----------
 
-#outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
-#write_csv(df,file.path(outputFolder, outputFile))
+outputFile = paste(subfolder, Sys.Date(), "merged.csv") # spaces will be inserted
+write_csv(df,file.path(outputFolder, outputFile))
 
