@@ -23,13 +23,13 @@ voxel_size <- 0.0011907 #     voxel size is 0.0011907 um3
 # TODO: update to allow user to select file
 
 # ENTER BACKGROUND FILENAME HERE ---
-subfolder <- "2019-01-18 analysis HK"
+subfolder <- file.path("2019-01-24 HK", "2019.01.15 GTY029 DM Mob1GFP_Cit1mCh")
 inputFolder <- here(file.path("data",subfolder))
-bkgdfile <- "Extracellular Background GFP channel.csv"
+bkgdfile <- "Extracellular Background GFP Channel GTY029.csv"
 
 xcell_bg <- read_csv(file.path(inputFolder, bkgdfile),
                           locale = locale(encoding = "latin1")) %>%
-  select(ItemName, ExtracellularBackground) # omit crazy other column
+  select(ItemName, ExtracellularBackground) # omit crazy other column(s)
 
 
 # check background distribution
@@ -52,7 +52,6 @@ raw_mito_intden <- all_mito %>%
   summarise(RawMitoIntDen = sum(`Sum (roGFP 470 (DCI: 60 its, roGFP 470))`), 
             RawMitoMean = sum(`Mean (roGFP 470 (DCI: 60 its, roGFP 470))`*`Volume (µm³)`)/sum(`Volume (µm³)`),
             MitoVolume_um3 = sum(`Volume (µm³)`),
-            MitoVoxelCount = sum(`Voxel Count`), # may not be present
             ItemName = first(`Item Name`)) 
 
 
@@ -69,7 +68,6 @@ raw_cell_intden <- df %>% filter(Population == "ROIs") %>% # cell and background
          RawCellIntDen = `Sum (roGFP 470 (DCI: 60 its, roGFP 470))`,
          RawCellMean = `Mean (roGFP 470 (DCI: 60 its, roGFP 470))`,
          CellVolume_um3 = `Volume (µm³)`,
-         CellVoxelCount = `Voxel Count`, # may not be present
          ItemName = `Item Name`)
 
 # Collect columns for cell, mito, and background ------
@@ -78,8 +76,7 @@ cell_mito_intden <- raw_cell_intden %>% ungroup %>%
   mutate(
   RawMitoIntDen = raw_mito_intden$RawMitoIntDen,
   RawMitoMean = raw_mito_intden$RawMitoMean,
-  MitoVolume_um3 = raw_mito_intden$MitoVolume_um3,
-  MitoVoxelCount = raw_mito_intden$MitoVoxelCount)
+  MitoVolume_um3 = raw_mito_intden$MitoVolume_um3)
 
 cell_mito_xc_bkd <- cell_mito_intden %>% left_join(xcell_bg) # only common column is ItemName
 
@@ -143,6 +140,11 @@ corrected_mito_loc_xc <- corrected_mito_loc_xc  %>%
 # remove impossible fractions > 1
 corrected_mito_loc_xc_filt <- corrected_mito_loc_xc %>% filter(FractionInMito < 1.0)
 
+# plots ----
+# TODO: separate script for plots
+# TODO: also plot jittered scatter with alpha for better visualization of outliers vs main bulk of measurements
+
+
 boxplot(corrected_mito_loc_xc_filt$FractionInMito ~ corrected_mito_loc_xc_filt$Temp, main = "Fraction of GFP integrated density in mitochondria") # whiskers extend to 1.5x interquartile range
 
 boxplot(corrected_mito_loc_xc_filt$MitoMeanCorr ~ corrected_mito_loc_xc_filt$Temp, main = "Mean GFP intensity in mitochondria")
@@ -150,7 +152,7 @@ boxplot(corrected_mito_loc_xc_filt$MitoMeanCorr ~ corrected_mito_loc_xc_filt$Tem
 # Compare total cell GFP across temperatures
 
 # is total cellular GFP constant with temp?
-boxplot(corrected_mito_loc_xc_filt$CellIntDenCorr ~ corrected_mito_loc_xc_filt$Temp, main = "Total corrected cell GFP, xc bkgd")
+boxplot(corrected_mito_loc_xc_filt$CellIntDenCorr ~ corrected_mito_loc_xc_filt$Temp, main = "Total corrected cell GFP")
 
 # cell intden vs volume
 # plot(corrected_mito_loc_xc$CellIntDenCorr, corrected_mito_loc_xc$CellVolume_um3, main = "XC Bkgd")
@@ -234,5 +236,5 @@ se_36_mean <- se(restrTmean)
 
 outputFile2 = paste(Sys.Date(), "mito_loc_xc_filt.csv") # spaces will be inserted
 
-#write_csv(corrected_mito_loc_xc_filt, file.path(here("data"), subfolder, outputFile2))
+write_csv(corrected_mito_loc_xc_filt, file.path(here("data"), subfolder, outputFile2))
 
