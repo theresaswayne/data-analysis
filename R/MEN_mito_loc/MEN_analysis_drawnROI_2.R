@@ -16,6 +16,7 @@ require(here)
 voxel_size <- 0.0011907 #     voxel size is 0.0011907 um3
 
 
+
 # TODO: for future analyses get a background ROI from the file. (How to choose? Make sure it's always larger than the cells?)
 
 # Get extracellular background from additional file -----
@@ -23,13 +24,19 @@ voxel_size <- 0.0011907 #     voxel size is 0.0011907 um3
 # TODO: update to allow user to select file
 
 # ENTER BACKGROUND FILENAME HERE ---
-subfolder <- file.path("2019-01-24 HK", "2019.01.15 GTY029 DM Mob1GFP_Cit1mCh")
+subfolder <- file.path("2019-01-24 HK", "2019.01.08 PSY106 WT Mob1GFP_Cit1mCh")
 inputFolder <- here(file.path("data",subfolder))
-bkgdfile <- "Extracellular Background GFP Channel GTY029.csv"
+bkgdfile <- "Extracellular Background GFP Channel PSY106 clump corrected.csv"
 
 xcell_bg <- read_csv(file.path(inputFolder, bkgdfile),
                           locale = locale(encoding = "latin1")) %>%
   select(ItemName, ExtracellularBackground) # omit crazy other column(s)
+
+# xcell_bg <- read_csv("data/2019-01-24 HK/2019.01.08 PSY106 WT Mob1GFP_Cit1mCh/Extracellular Background GFP Channel PSY106 clump corrected.csv", col_types = cols_only(ItemName = "c", ExtracellularBackground = "d"))
+
+# TODO: Allow easy loading of saved CSV from combine-files script
+# inputFile <- "ENTER HERE"
+#df <- read_csv((file.path(inputfolder, inputFile, col_types = col_types = cols(.default = "d", ItemName = "c", filename = "c")
 
 
 # check background distribution
