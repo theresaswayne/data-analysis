@@ -24,9 +24,9 @@ voxel_size <- 0.0011907 #     voxel size is 0.0011907 um3
 # TODO: update to allow user to select file
 
 # ENTER BACKGROUND FILENAME HERE ---
-subfolder <- file.path("2019-01-24 HK", "2019.01.08 PSY106 WT Mob1GFP_Cit1mCh")
+subfolder <- file.path("2019-01-28 PSY106 25C and 36C colony")
 inputFolder <- here(file.path("data",subfolder))
-bkgdfile <- "Extracellular Background GFP Channel PSY106 clump corrected.csv"
+bkgdfile <- "Extracellular Background GFP Channel PSY106 colony.csv"
 
 xcell_bg <- read_csv(file.path(inputFolder, bkgdfile),
                           locale = locale(encoding = "latin1")) %>%
@@ -245,3 +245,5 @@ outputFile2 = paste(Sys.Date(), "mito_loc_xc_filt.csv") # spaces will be inserte
 
 write_csv(corrected_mito_loc_xc_filt, file.path(here("data"), subfolder, outputFile2))
 
+
+# TODO: these have some cells counted multiple times! how to pull out?
