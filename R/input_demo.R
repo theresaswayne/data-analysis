@@ -5,6 +5,7 @@
 
 # No specific error catching; invalid files will show errors in console
 
+message("Open the first thingie")
 mydatafile <- file.choose() # opens a file chooser window, no message
 mydata <- read.csv(mydatafile) # we have the full file path
 specs <- attributes(mydata)
