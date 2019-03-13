@@ -21,17 +21,18 @@ logdata <- read_csv(logfile,
 
 
 startTimes <- logdata %>% 
-  filter(Event == "Plate read started") %>%
+  filter(grepl("started", Event)) %>%
   select(Start = Date)
 
 
 endTimes <- logdata %>% 
-  filter(Event == "Plate read successfully completed") %>%
-  select(End = Date) # the columns need to be renamed before combining in tidyverse
+  filter(grepl("completed", Event)) %>%
+  select(End = Date) # the columns need to be renamed before combining
 
 
-scanTimes <- as.tbl(cbind(startTimes, endTimes))
+scanTimes <- as.tbl(cbind(startTimes, endTimes)) # combine as tbl (default would be matrix)
 
 scanTimes <- scanTimes %>% 
-  mutate(elapsedTime = End - Start)
+  mutate(elapsedTime = End - Start) # calculate active time
+
 
