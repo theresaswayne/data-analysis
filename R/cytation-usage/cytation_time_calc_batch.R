@@ -5,6 +5,8 @@
 # Note -- include only the audit trail. No procedure summary or other info.
 # Date and time use the default Gen5 format.
 
+# TODO: handle files with repeated info (read the last few lines?)
+
 # ---- Setup ----
 
 require(tidyverse) # for reading and parsing
@@ -59,11 +61,11 @@ scanTimes <- full_join(startTimes, endTimes, by = "Read") %>% # combine using or
 # ---- Calculate elapsed time and save ----
 
 scanTimes <- scanTimes %>% 
-  mutate(elapsedTime = (End - Start)/60) # convert elapsedTime to hours
+  mutate(elapsedTime = difftime(End, Start, units = "hours")) # convert elapsedTime to hours
 
 scanTimeTotal <-  scanTimes %>%
   group_by(filename) %>%
-  summarise(TotalTime = sum(elapsedTime)) # calculate active time for each expt ( = each log file)
+  summarise(TotalHours = sum(elapsedTime)) # calculate active time for each expt ( = each log file)
 
 # save results in the parent of the log directory 
 

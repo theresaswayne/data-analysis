@@ -20,19 +20,40 @@ logdata <- read_csv(logfile,
                     skip = 2)
 
 
+# ---- Find start and end times ----
+
+# add a column for the Read number to help with merging the data later 
+
 startTimes <- logdata %>% 
   filter(grepl("started", Event)) %>%
-  select(Start = Date)
-
+  select(Start = Date)  %>%
+  mutate(Read = row_number())
 
 endTimes <- logdata %>% 
   filter(grepl("completed", Event)) %>%
-  select(End = Date) # the columns need to be renamed before combining
+  select(End = Date)  %>%
+  mutate(Read = row_number())
 
 
-scanTimes <- as.tbl(cbind(startTimes, endTimes)) # combine as tbl (default would be matrix)
+# combine start and end times so each row represents a single read step
+
+scanTimes <- full_join(startTimes, endTimes, by = "Read") # combine using original read number
+
+# ---- Calculate elapsed time and save ----
 
 scanTimes <- scanTimes %>% 
-  mutate(elapsedTime = End - Start) # calculate active time
+  mutate(elapsedTime = difftime(End, Start, units = "hours")) # convert elapsedTime to hours
 
+scanTimeTotal <-  scanTimes %>%
+  summarise(TotalHours = sum(elapsedTime)) # calculate active time for the whole expt
+
+# save results in the same directory 
+
+logName <- basename(logfile) # name of the file without higher levels
+
+parentDir <- dirname(logfile) # parent of the logfile
+
+outputFile = paste(Sys.Date(), logName, "_total.csv") # spaces will be inserted
+
+write_csv(scanTimeTotal,file.path(parentDir, outputFile))
 
