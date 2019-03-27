@@ -1,0 +1,250 @@
+CellProfiler Pipeline: http://www.cellprofiler.org
+Version:3
+DateRevision:20140124145122
+GitHash:0c7fb94
+ModuleCount:14
+HasImagePlaneDetails:False
+
+Images:[module_num:1|svn_version:\'Unknown\'|variable_revision_number:2|show_window:False|notes:\x5B\'To begin creating your project, use the Images module to compile a list of files and/or folders that you want to analyze. You can also specify a set of rules to include only the desired files in your selected folders. Folder names adjusted to force the good one to go through first.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    :
+    Filter images?:Images only
+    Select the rule criteria:and (extension does isimage) (directory doesnot startwith ".")
+
+Metadata:[module_num:2|svn_version:\'Unknown\'|variable_revision_number:4|show_window:False|notes:\x5B\'The Metadata module optionally allows you to extract information describing your images (i.e, metadata) which will be stored along with your measurements. This information can be contained in the file name and/or location, or in an external file.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Extract metadata?:No
+    Metadata data type:Text
+    Metadata types:{}
+    Extraction method count:1
+    Metadata extraction method:Extract from file/folder names
+    Metadata source:File name
+    Regular expression:plate(?P<Plate>\x5B0-9\x5D{2})\\\\.tif
+    Regular expression:(?P<Date>\x5B0-9\x5D{4}_\x5B0-9\x5D{2}_\x5B0-9\x5D{2})$
+    Extract metadata from:All images
+    Select the filtering criteria:and (file does contain "")
+    Metadata file location:
+    Match file and image metadata:\x5B\x5D
+    Use case insensitive matching?:No
+
+NamesAndTypes:[module_num:3|svn_version:\'Unknown\'|variable_revision_number:5|show_window:False|notes:\x5B\'The NamesAndTypes module allows you to assign a meaningful name to each image by which other modules will refer to it.\', \'---\', \'Load the plate image by matching files in the folder against "yeastplate". Load the template image as a binary mask. Original RGB pipeline protocol at http\x3A//www.cellprofiler.org/linked_files/Papers/31-Vokes_CurrentProtocols_2008.pdf. Note that all images and template must be the same size. This template is 1112x1112 pixels.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Assign a name to:Images matching rules
+    Select the image type:Grayscale image
+    Name to assign these images:DNA
+    Match metadata:\x5B{u\'OrigGray\'\x3A u\'Plate\', u\'PlateTemplate\'\x3A u\'Plate\'}\x5D
+    Image set matching method:Order
+    Set intensity range from:Image metadata
+    Assignments count:1
+    Single images count:1
+    Select the rule criteria:and (file does startwith "yeastplate")
+    Name to assign these images:OrigGray
+    Name to assign these objects:Cell
+    Select the image type:Grayscale image
+    Set intensity range from:Image metadata
+    Retain outlines of loaded objects?:No
+    Name the outline image:LoadedObjects
+    Single image location:file\x3A/Users/confocal/Downloads/cellprofiler/yeast%20grayscale%20colonies/input%20images/templates/PlateTemplateSquare.tif   
+    Name to assign this image:PlateTemplate
+    Name to assign these objects:Cytoplasm
+    Select the image type:Binary mask
+    Set intensity range from:Image metadata
+    Retain object outlines?:No
+    Name the outline image:LoadedOutlines
+
+Groups:[module_num:4|svn_version:\'Unknown\'|variable_revision_number:2|show_window:False|notes:\x5B\'The Groups module optionally allows you to split your list of images into image subsets (groups) which will be processed independently of each other. Examples of groupings include screening batches, microtiter plates, time-lapse movies, etc.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Do you want to group your images?:No
+    grouping metadata count:2
+    Metadata category:Plate
+    Metadata category:Plate
+
+CorrectIlluminationCalculate:[module_num:5|svn_version:\'Unknown\'|variable_revision_number:2|show_window:True|notes:\x5B"Correct for uneven illumination by creating an illumination correction function. Since most of the image is background, we use the \'Background\' method here. The idea is to smooth the function enough so that it reflects the uneven intensity variation."\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Select the input image:OrigGray
+    Name the output image:IllumGray
+    Select how the illumination function is calculated:Background
+    Dilate objects in the final averaged image?:No
+    Dilation radius:0
+    Block size:22
+    Rescale the illumination function?:No
+    Calculate function for each image individually, or based on all images?:Each
+    Smoothing method:Gaussian Filter
+    Method to calculate smoothing filter size:Automatic
+    Approximate object size:10
+    Smoothing filter size:10
+    Retain the averaged image?:No
+    Name the averaged image:IllumBlueAvg
+    Retain the dilated image?:No
+    Name the dilated image:IllumBlueDilated
+    Automatically calculate spline parameters?:Yes
+    Background mode:auto
+    Number of spline points:5
+    Background threshold:2
+    Image resampling factor:2
+    Maximum number of iterations:40
+    Residual value for convergence:0.001
+
+CorrectIlluminationApply:[module_num:6|svn_version:\'Unknown\'|variable_revision_number:3|show_window:True|notes:\x5B\'Apply the illumination function previously created to correct the original image. \'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Select the input image:OrigGray
+    Name the output image:CorrGray
+    Select the illumination function:IllumGray
+    Select how the illumination function is applied:Subtract
+
+Align:[module_num:7|svn_version:\'Unknown\'|variable_revision_number:3|show_window:True|notes:\x5B\'Align the plate image to the binary Plate Template. This step accounts for experimental variation in the plate placement. The corrected Image is also aligned by the same offset. Note that all images must be the same size.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Select the alignment method:Mutual Information
+    Crop mode:Keep size
+    Select the first input image:PlateTemplate
+    Name the first output image:AlignedPlate
+    Select the second input image:CorrGray
+    Name the second output image:AlignedGray
+
+MaskImage:[module_num:8|svn_version:\'Unknown\'|variable_revision_number:3|show_window:True|notes:\x5B\'Mask the Combined Image to the region of interest defined by the Plate Template. (changed this to the aligned version)\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Select the input image:AlignedGray
+    Name the output image:MaskedGray
+    Use objects or an image as a mask?:Image
+    Select object for mask:None
+    Select image for mask:AlignedPlate
+    Invert the mask?:No
+
+IdentifyPrimaryObjects:[module_num:9|svn_version:\'Unknown\'|variable_revision_number:10|show_window:True|notes:\x5B\'Identify all yeast colonies  within the plate. Adjust the min/max diameter depending on the expected colony size in your own images.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Select the input image:MaskedGray
+    Name the primary objects to be identified:Colonies
+    Typical diameter of objects, in pixel units (Min,Max):2,40
+    Discard objects outside the diameter range?:Yes
+    Try to merge too small objects with nearby larger objects?:No
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Shape
+    Method to draw dividing lines between clumped objects:Shape
+    Size of smoothing filter:0
+    Suppress local maxima that are closer than this minimum allowed distance:2
+    Speed up by using lower-resolution image to find local maxima?:No
+    Name the outline image:ColonyOutlines
+    Fill holes in identified objects?:Yes
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:No
+    Retain outlines of the identified objects?:Yes
+    Automatically calculate the threshold using the Otsu method?:Yes
+    Enter Laplacian of Gaussian threshold:.5
+    Automatically calculate the size of objects for the Laplacian of Gaussian filter?:Yes
+    Enter LoG filter diameter:5
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Threshold setting version:1
+    Threshold strategy:Global
+    Thresholding method:Otsu
+    Select the smoothing method for thresholding:Automatic
+    Threshold smoothing scale:1
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.001,1
+    Approximate fraction of image covered by objects?:0.1
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Select binary image:MoG Global
+    Masking objects:From image
+    Two-class or three-class thresholding?:Three classes
+    Minimize the weighted variance or the entropy?:Weighted variance
+    Assign pixels in the middle intensity class to the foreground or the background?:Background
+    Method to calculate adaptive window size:Image size
+    Size of adaptive window:10
+
+MeasureObjectSizeShape:[module_num:10|svn_version:\'Unknown\'|variable_revision_number:1|show_window:True|notes:\x5B\'Measure area and shape features of each colony.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Select objects to measure:Colonies
+    Calculate the Zernike features?:No
+
+ClassifyObjects:[module_num:11|svn_version:\'Unknown\'|variable_revision_number:2|show_window:True|notes:\x5B\'Classify each colony for the desired parameters.First, based on area in a histogram with three bins to distinguish tiny, small, and large colonies. Second, by position just to illustrate another parameter.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Make each classification decision on how many measurements?:Single measurement
+    Hidden:2
+    Select the object to be classified:Colonies
+    Select the measurement to classify by:AreaShape_Area
+    Select bin spacing:Custom-defined bins
+    Number of bins:1
+    Lower threshold:0
+    Use a bin for objects below the threshold?:No
+    Upper threshold:1
+    Use a bin for objects above the threshold?:No
+    Enter the custom thresholds separating the values between bins:0,50,100,200
+    Give each bin a name?:Yes
+    Enter the bin names separated by commas:Tiny,Small,Large
+    Retain an image of the classified objects?:Yes
+    Name the output image:SizeClassifiedColonies
+    Select the object to be classified:Colonies
+    Select the measurement to classify by:Location_Center_X
+    Select bin spacing:Custom-defined bins
+    Number of bins:3
+    Lower threshold:0
+    Use a bin for objects below the threshold?:Yes
+    Upper threshold:1
+    Use a bin for objects above the threshold?:Yes
+    Enter the custom thresholds separating the values between bins:400,800
+    Give each bin a name?:No
+    Enter the bin names separated by commas:
+    Retain an image of the classified objects?:Yes
+    Name the output image:XClassifiedColonies
+    Select the object name:Colonies
+    Select the first measurement:None
+    Method to select the cutoff:Mean
+    Enter the cutoff value:.5
+    Select the second measurement:None
+    Method to select the cutoff:Mean
+    Enter the cutoff value:.5
+    Use custom names for the bins?:No
+    Enter the low-low bin name:LowLow
+    Enter the low-high bin name:HighLow
+    Enter the high-low bin name:LowHigh
+    Enter the high-high bin name:HighHigh
+    Retain an image of the classified objects?:No
+    Enter the image name:ClassifiedNuclei
+
+OverlayOutlines:[module_num:12|svn_version:\'Unknown\'|variable_revision_number:2|show_window:True|notes:\x5B\'Overlay the colony outlines upon the Masked Plate image.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Display outlines on a blank image?:No
+    Select image on which to display outlines:MaskedGray
+    Name the output image:OutlinedColonies
+    Outline display mode:Color
+    Select method to determine brightness of outlines:Max of image
+    Width of outlines:1
+    Select outlines to display:ColonyOutlines
+    Select outline color:Red
+
+SaveImages:[module_num:13|svn_version:\'Unknown\'|variable_revision_number:10|show_window:True|notes:\x5B\'Save the outline overlay image. Save the image to the default output folder.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Select the type of image to save:Image
+    Select the image to save:OutlinedColonies
+    Select the objects to save:None
+    Select the module display window to save:OutlinedColonies
+    Select method for constructing file names:Sequential numbers
+    Select image name for file prefix:OrigGray
+    Enter file prefix:plateoutline
+    Number of digits:2
+    Append a suffix to the image file name?:Yes
+    Text to append to the image name:_outlines
+    Saved file format:png
+    Output file location:Default Output Folder\x7CNone
+    Image bit depth:8
+    Overwrite existing files without warning?:No
+    When to save:Every cycle
+    Rescale the images? :No
+    Save as grayscale or color image?:Grayscale
+    Select colormap:gray
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...\x7C/Users/veneskey/svn/pipeline/ExampleImages/ExampleYeastColonies_BT_Images
+
+ExportToSpreadsheet:[module_num:14|svn_version:\'Unknown\'|variable_revision_number:9|show_window:True|notes:\x5B\'Export measurements to a comma-delimited file (.csv). Individual colony measurements will be saved to the Colonies .csv file, and image summaries to the Image .csv.\'\x5D|batch_state:array(\x5B\x5D, dtype=uint8)|enabled:True]
+    Select the column delimiter:Comma (",")
+    Add image metadata columns to your object data file?:No
+    Limit output to a size that is allowed in Excel?:No
+    Select the measurements to export:No
+    Calculate the per-image mean values for object measurements?:No
+    Calculate the per-image median values for object measurements?:No
+    Calculate the per-image standard deviation values for object measurements?:No
+    Output file location:Default Output Folder\x7C.
+    Create a GenePattern GCT file?:No
+    Select source of sample row name:Metadata
+    Select the image to use as the identifier:None
+    Select the metadata to use as the identifier:None
+    Export all measurement types?:No
+    Press button to select measurements to export:None\x7CNone
+    Representation of Nan/Inf:NaN
+    Data to export:Image
+    Combine these object measurements with those of the previous object?:No
+    File name:Image.csv
+    Use the object name for the file name?:No
+    Data to export:Colonies
+    Combine these object measurements with those of the previous object?:No
+    File name:Colonies.csv
+    Use the object name for the file name?:No
