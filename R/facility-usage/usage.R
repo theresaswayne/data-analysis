@@ -1,8 +1,7 @@
 # usage.R
 # pulling useful data from iLab usage tables
 
-library(dplyr)
-library(readr)
+require(tidyverse)
 
 # Import data ------
 
