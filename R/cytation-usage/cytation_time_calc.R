@@ -44,8 +44,11 @@ scanTimes <- full_join(startTimes, endTimes, by = "Read") # combine using origin
 scanTimes <- scanTimes %>% 
   mutate(elapsedTime = difftime(End, Start, units = "hours")) # convert elapsedTime to hours
 
+# filter out NAs that arise from aborted runs
+# calculate active time for whole expt
 scanTimeTotal <-  scanTimes %>%
-  summarise(TotalHours = sum(elapsedTime)) # calculate active time for the whole expt
+  filter(is.na(elapsedTime) == FALSE) %>%
+  summarise(TotalHours = sum(elapsedTime)) 
 
 # save results in the same directory 
 
