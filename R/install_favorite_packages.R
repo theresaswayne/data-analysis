@@ -41,7 +41,7 @@ require(devtools)
 BiocManager::install() # update existing
 
 if (!("EBImage" %in% existing)) {
-  BiocManager::install(EBImage)
+  BiocManager::install("EBImage")
   print("Installed EBImage using BiocManager")
   }
 
