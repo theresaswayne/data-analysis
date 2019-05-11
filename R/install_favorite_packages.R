@@ -33,9 +33,9 @@ if (length(need_to_install) != 0) {
   print("All CRAN packages have been installed.")
 }
 
-# Bioconductor and SMoLR packages (biocLite is deprecated)
+# Bioconductor and SMoLR packages 
 # source("https://bioconductor.org/biocLite.R")
-# biocLite("BiocUpgrade")
+# biocLite("BiocUpgrade")   # (biocLite is deprecated)
 require(BiocManager)
 require(devtools)
 BiocManager::install() # update existing
