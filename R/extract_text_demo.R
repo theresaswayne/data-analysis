@@ -43,10 +43,8 @@ df <- data.frame(label, time, merged_types, count)
 df$label <- gsub("-t[0-9]*", "", df$label)
 df$label <- gsub("-Particles inside", "", df$label)
 df$label <- gsub("-Total particles", "", df$label)
+df$label <- gsub("C1-", "", df$label)
 
-# TODO: Reshape the table so that each timepoint is a row and the types become variables
+# Reshape the table so that each timepoint is a row and the types become variables
 
-#data = your data.frame, idvar = the variable that identifies your groups, v.names = the variables that will become multiple columns in wide format, timevar = the variable containing the values that will be appended to v.names in wide format, direction = wide, and sep = "_"
-
-#spread(dat1, numbers, value = value)
-
+df_spread <- spread(df, merged_types, count)
