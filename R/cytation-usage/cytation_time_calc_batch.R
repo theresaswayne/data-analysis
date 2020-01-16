@@ -33,7 +33,7 @@ mergedDataWithNames <- tibble(filename = files) %>% # column 1 = file names
 
 # make the list into a flat file -- each row contains its source filename
 
-logdata <- unnest(mergedDataWithNames)
+logdata <- unnest(mergedDataWithNames, cols=c(file_contents)) # added in response to 'cols is now required' error
 
 
 # ---- Find start and end times ----
