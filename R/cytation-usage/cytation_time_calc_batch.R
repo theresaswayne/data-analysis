@@ -81,7 +81,7 @@ parentName <- basename(dirname(logfolder)) # name of the log directory without h
 
 parentDir <- dirname(logfolder) # parent of the log directory
 
-outputFile = paste(Sys.Date(), parentName, "_totals.csv") # spaces will be inserted
+outputFile = paste(Sys.Date(), basename(logfolder), "_totals.csv") # spaces will be inserted
 
 write_csv(scanTimeTotal,file.path(parentDir, outputFile))
 
