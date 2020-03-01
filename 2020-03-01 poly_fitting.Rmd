@@ -97,3 +97,16 @@ fit_spec <- lm(y ~ I(x^3), data = df_arbitrary)
 lines(x, predict(fit_spec, data.frame(x = x)), col = "yellow")
 summary(fit_spec)
 ```
+
+### Trying it on more realistic data
+```{r lm_arbit_noisy}
+
+# Add noise
+noise <- rnorm(1000, mean=0, sd = 1)
+df_noisy <- bind_cols()
+plot(df_arbitrary, xlab = "x", ylab = "y",
+    las = 1)
+fit_spec <- lm(y ~ I(x^3), data = df_arbitrary)
+lines(x, predict(fit_spec, data.frame(x = x)), col = "yellow")
+summary(fit_spec)
+```
