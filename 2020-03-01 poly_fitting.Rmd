@@ -102,7 +102,7 @@ summary(fit_spec)
 
 The dataset size is reduced to 100 and gaussian noise with a SD of 100 is added
 
-As a result, the fit is determined with a different intercept (noise disproportionately affects smaller values of y)
+The fit is still determined with good confidence in the coefficient, but less confidence in the intercept (perhaps because noise disproportionately affects smaller values of y)
 
 ```{r lm_arbit_noisy}
 
