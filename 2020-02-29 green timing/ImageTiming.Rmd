@@ -1,0 +1,185 @@
+---
+title: "Imaging Time Lags"
+author: "Theresa Swayne"
+date: "2/28/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(readxl)
+library(dplyr)
+```
+
+## 3-channel STORM experiment
+
+A 3-channel STORM expt was run with exposure time "1 frame" for 30000 frames.
+The time lag between successive frames was calculated from the metadata.
+
+```{r load_3chSTORM}
+mydir <- "~/Desktop/" 
+storm3ch <- read_excel(file.path(mydir,"2020-02-29 green timing/storm001.xlsx"))
+storm3ch <- storm3ch[-c(1),c(1:11)] # remove blank row
+storm3ch$TimeLag <- c(NA, diff(storm3ch$`Time [s]`)) # calculate time difference from one row to the next
+```
+
+The values have a wide range.
+
+```{r stats}
+summarise(storm3ch,mean=mean(TimeLag, na.rm = TRUE), stdev = sd(TimeLag, na.rm=TRUE), median = median(TimeLag, na.rm = TRUE), min=min(TimeLag,na.rm = TRUE), max=max(TimeLag,na.rm = TRUE))
+```
+
+Most time intervals are short:
+
+```{r plotlags, echo=FALSE}
+histo <- ggplot(storm3ch, aes(x = TimeLag)) + geom_histogram(bins = 50, na.rm=TRUE) + ggtitle("3-channel STORM time intervals")
+histo
+```
+
+But there are a large number of timepoints where there is a longer lag between points:
+
+```{r plotlags2, echo = FALSE}
+loghisto<- ggplot(storm3ch, aes(x = TimeLag)) + geom_histogram() + scale_y_log10() + ggtitle("3-channel STORM time intervals, log scale")
+loghisto
+```
+
+And these occur throughout the experiment:
+```{r plotlags3ch, echo=FALSE}
+lag_vs_index <- ggplot(storm3ch, aes(x=Index, y=TimeLag)) + geom_point(alpha=0.3, color = "blue") + ggtitle("3-channel STORM lag vs. timepoint")
+lag_vs_index
+```
+
+However, this lag added only slightly to the length of the experiment:
+```{r expectedtime}
+expected <- median(storm3ch$TimeLag, na.rm=TRUE) * length(storm3ch$TimeLag)
+paste("Median time * # timepoints =",expected, "s expected time required")
+actual <- sum(storm3ch$TimeLag, na.rm=TRUE)
+paste("Sum of time intervals =", actual, "s actual time taken")
+delay <- (actual - expected)/60
+paste("Actual time - expected time =",delay,"min added in 30-min experiment")
+```
+
+## 1-channel STORM experiment
+
+A 1-channel (647 nm) STORM experiment was run with all other  parameters the same.
+```{r load_1chSTORM}
+storm1ch <- read_excel(file.path(mydir,"2020-02-29 green timing/storm 647 only.xlsx"))
+storm1ch <- storm1ch[-c(1),c(1:11)] # remove blank row
+storm1ch$TimeLag <- c(NA, diff(storm1ch$`Time [s]`)) # calculate time difference from one row to the next
+```
+
+Based on the histogram and the distribution throughout the experiment, the elimination of channels does not affect the lagging behavior.
+```{r plotlags1ch, echo = FALSE}
+loghisto<- ggplot(storm1ch, aes(x = TimeLag)) + geom_histogram() + scale_y_log10() + ggtitle("1-channel STORM time intervals, log scale")
+lag_vs_index <- ggplot(storm1ch, aes(x=Index, y=TimeLag)) + geom_point(alpha=0.3, color = "blue") + ggtitle("1-channel STORM lag vs. timepoint")
+loghisto
+lag_vs_index
+```
+
+Although the mean interval is lower as expected, the standard deviation is higher.
+
+The total delay is twice as long in the 1-channel experiment, but still only ~3% of the total:
+
+```{r stats1ch}
+summarise(storm1ch,mean=mean(TimeLag, na.rm = TRUE), stdev = sd(TimeLag, na.rm=TRUE), median = median(TimeLag, na.rm = TRUE), min=min(TimeLag,na.rm = TRUE), max=max(TimeLag,na.rm = TRUE))
+expected1ch <- median(storm1ch$TimeLag, na.rm=TRUE) * length(storm1ch$TimeLag)
+paste("Median time * # timepoints =",expected1ch, "s expected time required")
+actual1ch <- sum(storm1ch$TimeLag, na.rm=TRUE)
+paste("Sum of time intervals =", actual1ch, "s actual time taken")
+delay1ch <- (actual1ch - expected1ch)/60
+paste("Actual time - expected time =",delay1ch,"min added in 30-min 1-channel experiment")
+```
+
+
+## Andor EMCCD without STORM
+
+A triggered TIRF experiment was run with all imaging parameters the same but only 1000 frames.
+
+```{r load_tirf}
+trigtirf <- read_excel(file.path(mydir,"2020-02-29 green timing/triggered tirf.xlsx"))
+trigtirf  <- trigtirf[-c(1),c(1:11)] # remove blank row
+trigtirf$TimeLag <- c(NA, diff(trigtirf$`Time [s]`)) # calculate time difference from one row to the next
+```
+
+Here, the time intervals were much more consistent.
+
+```{r plotlags_trigtirf, echo = FALSE}
+loghisto<- ggplot(trigtirf, aes(x = TimeLag)) + geom_histogram() + scale_y_log10() + ggtitle("Triggered TIRF time intervals, log scale")
+lag_vs_index <- ggplot(trigtirf, aes(x=Index, y=TimeLag)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Triggered TIRF lag vs. timepoint")
+loghisto
+lag_vs_index
+```
+
+In a straight TIRF experiment, as expected from the graphs, the delay is negligible.
+
+
+```{r stats_trigtirf}
+summarise(trigtirf,mean=mean(TimeLag, na.rm = TRUE), stdev = sd(TimeLag, na.rm=TRUE), median = median(TimeLag, na.rm = TRUE), min=min(TimeLag,na.rm = TRUE), max=max(TimeLag,na.rm = TRUE))
+expected_trigtirf <- median(trigtirf$TimeLag, na.rm=TRUE) * length(trigtirf$TimeLag)
+paste("Median time * # timepoints =",expected_trigtirf, "s expected time required")
+actual_trigtirf <- sum(trigtirf$TimeLag, na.rm=TRUE)
+paste("Sum of time intervals =", actual_trigtirf, "s actual time taken")
+delay_trigtirf <- (actual_trigtirf - expected_trigtirf)/60
+paste("Actual time - expected time =",delay_trigtirf,"min added in 1000-frame experiment")
+```
+
+
+## 4-channel triggered spinning-disk experiments
+
+
+A triggered spinning-disk experiment was run with 1-frame exposure and 4 channels, 680 frames.
+
+```{r load_sd1, echo=FALSE}
+sd1 <- read_excel(file.path(mydir,"2020-02-29 green timing/4ch triggered 001.xlsx"))
+sd1  <- sd1[-c(1),c(1:11)] # remove blank row
+sd1$TimeLag <- c(NA, diff(sd1$`Time [s]`)) # calculate time difference from one row to the next
+```
+
+Here we also had extremely low variability.
+
+```{r plotlags_sd1, echo = FALSE}
+loghisto<- ggplot(sd1, aes(x = TimeLag)) + geom_histogram() + scale_y_log10() + ggtitle("Triggered SD time intervals, log scale")
+lag_vs_index <- ggplot(sd1, aes(x=Index, y=TimeLag)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Triggered SD lag vs. timepoint")
+loghisto
+lag_vs_index
+```
+
+
+```{r stats_sd1, echo=FALSE}
+summarise(sd1,mean=mean(TimeLag, na.rm = TRUE), stdev = sd(TimeLag, na.rm=TRUE), median = median(TimeLag, na.rm = TRUE), min=min(TimeLag,na.rm = TRUE), max=max(TimeLag,na.rm = TRUE))
+expected_sd1 <- median(sd1$TimeLag, na.rm=TRUE) * length(sd1$TimeLag)
+paste("Median time * # timepoints =",expected_sd1, "s expected time required")
+actual_sd1 <- sum(sd1$TimeLag, na.rm=TRUE)
+paste("Sum of time intervals =", actual_sd1, "s actual time taken")
+delay_sd1 <- (actual_sd1 - expected_sd1)/60
+paste("Actual time - expected time =",delay_sd1,"min added in 680-frame experiment")
+```
+
+
+Another triggered spinning-disk experiment was run with 1-frame exposure and 4 channels, with 128x128 ROI, for 2000 frames. Results are similar.
+
+```{r load_sd128, echo=FALSE}
+sd128 <- read_excel(file.path(mydir,"2020-02-29 green timing/4ch triggered 128.xlsx"))
+sd128  <- sd128[-c(1),c(1:11)] # remove blank row
+sd128$TimeLag <- c(NA, diff(sd128$`Time [s]`)) # calculate time difference from one row to the next
+```
+
+```{r plotlags_sd128, echo = FALSE}
+loghisto<- ggplot(sd128, aes(x = TimeLag)) + geom_histogram() + scale_y_log10() + ggtitle("Triggered SD 128x128 time intervals, log scale")
+lag_vs_index <- ggplot(sd128, aes(x=Index, y=TimeLag)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Triggered SD 128 x 128 lag vs. timepoint")
+loghisto
+lag_vs_index
+```
+
+```{r stats_sd128, echo=FALSE}
+summarise(sd128,mean=mean(TimeLag, na.rm = TRUE), stdev = sd(TimeLag, na.rm=TRUE), median = median(TimeLag, na.rm = TRUE), min=min(TimeLag,na.rm = TRUE), max=max(TimeLag,na.rm = TRUE))
+expected_sd128 <- median(sd128$TimeLag, na.rm=TRUE) * length(sd128$TimeLag)
+paste("Median time * # timepoints =",expected_sd128, "s expected time required")
+actual_sd128 <- sum(sd128$TimeLag, na.rm=TRUE)
+paste("Sum of time intervals =", actual_sd128, "s actual time taken")
+delay_sd128 <- (actual_sd128 - expected_sd128)/60
+paste("Actual time - expected time =",delay_sd128,"min added in 2000-frame experiment")
+```

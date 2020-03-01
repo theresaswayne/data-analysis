@@ -1,0 +1,99 @@
+---
+title: "Polynomial fitting"
+output:
+  html_document:
+    df_print: paged
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+```{r setup}
+library(ggplot2)
+library(dplyr)
+```
+
+
+## Generate some data from a known 3rd-degree polynomial function
+
+Using the equation:
+y = ax^3 + bx^2 + cx + d
+
+Set a and d to arbitrary positive numbers and b, c to 0.
+Choose an x range from 0 to 100 in 0.1 increments.
+Calculate and plot y.
+
+```{r arbitrary_equation}
+a <- 2
+b <- 0
+c <- 0
+d <- 6
+x <- seq(0,100,0.1)
+y <- a*x^3 + b*x^2 + c*x + d
+df_arbitrary <- bind_cols(x=x, y=y)
+sample_plot <- ggplot(df_arbitrary, aes(x=x, y=y)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Arbitrary 3rd-degree polynomial")
+sample_plot
+```
+
+## Example of fitting polynomials from R docs
+
+The lm function can be used to fit polynomials of varying degree.
+
+Here 4 different best fits are determined for the relationship between stopping distance and speed using the built-in cars dataset.
+
+ANOVA is used to evaluate the best fitting function.
+
+
+```{r cars}
+## An example of polynomial regression
+plot(cars, xlab = "Speed (mph)", ylab = "Stopping distance (ft)",
+    las = 1, xlim = c(0, 25))
+
+# generate x values for fit lines
+d_speed <- seq(0, 25, length.out = 200) 
+
+# fit different degree polynomials
+for(degree in 1:4) {
+  fm <- lm(dist ~ poly(speed, degree, raw=TRUE), data = cars)
+  # create variable to hold results
+  assign(paste("cars", degree, sep = "."), fm) 
+  lines(d_speed, predict(fm, data.frame(speed = d_speed)), col = degree)
+}
+anova(cars.1, cars.2, cars.3, cars.4)
+```
+
+## Applying polynomial fitting to arbitrary data
+
+### 1. Leaving coefficents unspecified
+
+Here we use poly(x, 3, raw=TRUE) to restrict the fit to a 3rd-degree polynomial and recover the "raw" coefficients (otherwise we would get coefficients for the "orthogonal polynomial" which we do not want here)
+
+The summary shows that the middle coefficients (b and c) are correctly determined to be close to 0.
+
+```{r lm_arbit}
+
+## Try to fit without specifying coefficients
+
+plot(df_arbitrary, xlab = "x", ylab = "y",
+    las = 1)
+
+mypoly <- poly(x, 3, raw = TRUE)
+fit_open <- lm(y ~ mypoly, data = df_arbitrary)
+
+# add the fit line to the plot and print the summary
+lines(x, predict(fit_open, data.frame(x = x)), col = "red")
+summary(fit_open)
+```
+
+### 2. Constraining the middle coefficients to be 0
+
+Using the "I" notation we can specify the model to be of the form ax^3 + d. (The intercept is implied in the I notation; if we wanted to constrain that to be 0 as well, we could say lm(y ~ I(x^3) ~ 1))
+
+
+```{r lm_arbit_specify}
+plot(df_arbitrary, xlab = "x", ylab = "y",
+    las = 1)
+fit_spec <- lm(y ~ I(x^3), data = df_arbitrary)
+lines(x, predict(fit_spec, data.frame(x = x)), col = "yellow")
+summary(fit_spec)
+```
