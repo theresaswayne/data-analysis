@@ -99,14 +99,22 @@ summary(fit_spec)
 ```
 
 ### Trying it on more realistic data
+
+The dataset size is reduced to 100 and gaussian noise with a SD of 100 is added
+
+As a result, the fit is determined with a different intercept (noise disproportionately affects smaller values of y)
+
 ```{r lm_arbit_noisy}
 
-# Add noise
-noise <- rnorm(1000, mean=0, sd = 1)
-df_noisy <- bind_cols()
-plot(df_arbitrary, xlab = "x", ylab = "y",
+# Add noise and reduce size of dataset
+noise <- rnorm(100, mean=0, sd = 100)
+noisy_y <- df_arbitrary$y[1:100] + noise
+
+df_noisy <- bind_cols(x = df_arbitrary$x[1:100], y = noisy_y)
+plot(df_noisy, xlab = "x", ylab = "y",
     las = 1)
-fit_spec <- lm(y ~ I(x^3), data = df_arbitrary)
-lines(x, predict(fit_spec, data.frame(x = x)), col = "yellow")
-summary(fit_spec)
+fit_noisy <- lm(y ~ I(x^3), data = df_noisy)
+lines(x, predict(fit_noisy, data.frame(x = x)), col = "orange")
+summary(fit_noisy)
+coefficients(fit_noisy)
 ```
