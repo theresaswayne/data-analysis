@@ -1,0 +1,93 @@
+---
+title: "Imaging Time Lags with Real STORM Data"
+author: "Theresa Swayne"
+date: "3/3/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(readxl)
+library(readr)
+library(dplyr)
+```
+
+## STORM data
+
+Data was taken from Alex's datasets on the computer from November 2019 to February 2020.
+
+For most experiments full metadata was saved and the "Recorded Data" sheet exported as CSV.
+
+The time lag between successive frames was calculated from the metadata.
+
+```{r load_STORM}
+mydir <- "~/Documents/home-github/data-analysis/R/Green scope timing/2020-03-01 green timing/Alex metadata/" 
+storm <- read_csv(file.path(mydir,"2019-11-14 231_1hr_spread_1to50(12g10)_1to200(mab13)_13.csv"))
+storm <- storm[-c(1),c(1:11)] # remove blank row
+storm$TimeLag <- c(NA, diff(storm$`Time [s]`)) # calculate time difference from one row to the next
+storm <- na.omit(storm) # remove first row that contains an NA for the diff
+```
+
+Summary statistics:
+
+```{r stats}
+summarise(storm,mean=mean(TimeLag), stdev = sd(TimeLag), median = median(TimeLag), min=min(TimeLag), max=max(TimeLag))
+```
+
+Histogram:
+
+```{r plotlags1, echo=FALSE}
+#histo <- ggplot(storm, aes(x = TimeLag)) + geom_histogram(bins = 50) + ggtitle("STORM time intervals")
+
+loghisto<- ggplot(storm, aes(x = TimeLag)) + geom_histogram() + scale_y_log10() + ggtitle("STORM time intervals, log scale")
+
+#histo
+loghisto
+
+```
+
+Unlike in the earlier test data, in this real experiment the longer time lags appear in a different pattern. 
+
+1. The vast majority of time lags are ~0.05 s
+2. A few hundred are about twice that, ~0.08 s
+3. A small number are irregular intervals, a very few much longer, and concentrated towards the last third of the experiment.
+
+```{r plotlags2, echo=FALSE}
+lag_vs_index <- ggplot(storm, aes(x=Index, y=TimeLag)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Time lag vs. timepoint")
+lag_vs_index
+```
+
+However, this does not add much to the length of the experiment in this case.
+
+```{r expectedtime min}
+expected <- median(storm$TimeLag) * length(storm$TimeLag) /  60
+paste("Median time * # timepoints =",expected, "s expected time required")
+actual <- sum(storm$TimeLag)/60
+paste("Sum of time intervals =", actual, "min actual time taken")
+delay <- actual - expected
+paste("Actual time - expected time =",delay,"min added to experiment")
+```
+
+It seems like the longer time lags come up at regular intervals at the beginning of the experiment.
+
+```{r plotlags3, echo=FALSE}
+lag_vs_index_subset <- ggplot(storm[1:1000,], aes(x=Index, y=TimeLag)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Time lag vs. timepoint, 1st 1000 frames")
+lag_vs_index_subset
+```
+
+And although the time is not that constant at the end of the experiment, the interval seems fairly so.
+
+```{r plotlags4, echo=FALSE}
+lag_vs_index_subset2 <- ggplot(storm[28999:29999,], aes(x=Index, y=TimeLag)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Time lag vs. timepoint, last 1000 frames")
+lag_vs_index_subset2
+```
+
+TODO: 
+Extract the rows with lag between 0.05 and 0.10.
+Sort by index and then add a new column containing the diff between indices.
+Get summary stats and histo for this new diff column.
+If the distribution is tight then there is a periodic increase in the time required which must be due to some hw/sw event.
+
