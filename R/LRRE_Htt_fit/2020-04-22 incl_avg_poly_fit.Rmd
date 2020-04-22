@@ -1,0 +1,204 @@
+---
+title: "Processing inclusion population data and polynomial fitting"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup}
+library(ggplot2)
+library(dplyr)
+```
+
+## Load the data
+```{r load}
+radius <- read.csv("/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/radius.csv", na = "NA")
+
+area <- read.csv("/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/area.csv", na = "NA")
+
+volume <- read.csv("/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/volume.csv", na = "NA")
+```
+
+## For all datasets, calculate average and SEM of all inclusions at each timepoint 
+```{r average}
+
+radius_avg <- rowMeans(radius[,-1], na.rm = TRUE)
+
+# apply the sem function across rows excluding the 1st column
+radius_sem <- apply(radius[,-1], 1, function(x) (sd(x, na.rm = TRUE)/sqrt(sum(!is.na(x)))))
+                                                 
+area_avg <- rowMeans(area[,-1], na.rm = TRUE) 
+#area_avg <- cbind(time = c(0:6), area = area_avg) # add a time column so that we can fit the f
+area_sem <- apply(area[,-1], 1,
+                  function(x) (sd(x, na.rm = TRUE)/sqrt(sum(!is.na(x)))))
+                                  
+volume_avg <- rowMeans(volume[,-1], na.rm = TRUE)
+volume_sem <- apply(volume[,-1], 1, function(x) (sd(x, na.rm = TRUE)/sqrt(sum(!is.na(x)))))
+```
+
+## Fit the data to specified functions
+```{r}
+
+# This is the time column that we will use for all fits
+times <- (0:6)
+
+# Fit radius to a straight line
+fit_radius <- lm(radius_avg ~ I(times))
+predict_radius <- predict(fit_radius, data.frame(x = times))
+summary(fit_radius)
+
+# Fit area to ax2 +bx + c with b = 0
+fit_area <- lm(area_avg ~ I(times^2))
+predict_area <- predict(fit_area, data.frame(x = times))
+summary(fit_area)
+
+# Fit volume to ax3 + c
+fit_volume <- lm(volume_avg ~ I(times^3))
+predict_volume <- predict(fit_volume, data.frame(x = times))
+summary(fit_volume)
+
+```
+
+
+## ggplot example
+Using the equation:
+y = ax^3 + bx^2 + cx + d
+
+Set a and d to arbitrary positive numbers and b, c to 0.
+Choose an x range from 0 to 100 in 0.1 increments.
+Calculate and plot y.
+
+```{r arbitrary_equation}
+a <- 2
+b <- 0
+c <- 0
+d <- 6
+x <- seq(0,100,0.1)
+y <- a*x^3 + b*x^2 + c*x + d
+df_arbitrary <- bind_cols(x=x, y=y)
+sample_plot <- ggplot(df_arbitrary, aes(x=x, y=y)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Arbitrary 3rd-degree polynomial")
+sample_plot
+```
+
+## Applying polynomial fitting to arbitrary data
+
+### 1. Leaving coefficents unspecified
+
+Here we use poly(x, 3, raw=TRUE) to restrict the fit to a 3rd-degree polynomial and recover the "raw" coefficients (otherwise we would get coefficients for the "orthogonal polynomial" which we do not want here)
+
+The summary shows that the middle coefficients (b and c) are correctly determined to be close to 0.
+
+```{r lm_arbit}
+
+## Try to fit without specifying coefficients
+
+plot(df_arbitrary, xlab = "x", ylab = "y",
+    las = 1)
+
+mypoly <- poly(x, 3, raw = TRUE)
+fit_open <- lm(y ~ mypoly, data = df_arbitrary)
+
+# add the fit line to the plot and print the summary
+lines(x, predict(fit_open, data.frame(x = x)), col = "red")
+summary(fit_open)
+```
+
+### 2. Constraining the middle coefficients to be 0
+
+Using the "I" notation we can specify the model to be of the form ax^3 + d. (The intercept is implied in the I notation; if we wanted to constrain that to be 0 as well, we could say lm(y ~ I(x^3) ~ 1))
+
+
+```{r lm_arbit_specify}
+plot(df_arbitrary, xlab = "x", ylab = "y",
+    las = 1)
+fit_spec <- lm(y ~ I(x^3), data = df_arbitrary)
+lines(x, predict(fit_spec, data.frame(x = x)), col = "yellow")
+summary(fit_spec)
+```
+
+
+Load data from inclusions.
+The column names are the cytoplasmic mean intensity.
+
+```{r load inclusion data}
+library(readxl)
+IB_volumes_for_R <- read_excel("~/Desktop/research/images/images IB growth/htt tiffs 18_3_6/Done/IB volumes for R.xlsx", 
+    na = "NA")
+```
+
+Fit data from a single inclusion at a time.
+
+```{r fit single column}
+fit_incl1 <- lm(`1392` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`2695` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`1857` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`1686` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`1616` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`2130` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`2010` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`1981` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`2654` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`1272` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+fit_incl1 <- lm(`1782.3744799999999` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+
+# plot one inclusion's data
+fit_incl1 <- lm(`1392` ~ I(time^3), data = IB_volumes_for_R)
+summary(fit_incl1)
+
+incl_1392 <- ggplot(IB_volumes_for_R, aes(x=time, y=`1392`)) + geom_point(alpha=0.3, color = "blue") + ggtitle("Inclusion 1392")
+
+incl_1392
+```
+
+Fit data from the whole table and save the coefficients, R^2, and p values in a new table.
+
+``` {r apply fit to several columns}
+
+# the [,2:ncol()] means process all rows, and process column 2 (the first inclusion data) to the end
+# the "2" argument means apply to each column
+
+fit_summs <- apply(IB_volumes_for_R[,2:ncol(IB_volumes_for_R)], 2, function(x) summary(lm(x ~ I(time^3), data = IB_volumes_for_R)))
+
+# to get the values in a usable form
+# fit_summs$`1392`["coefficients"] gives a table where the rows are the coeffs, 1st col is the coeff itself, 4th col is the p value
+
+# we want the column name, R squared, coefficients (intercept, I(time^3)), and for each coefficient the P value.
+
+names(fit_summs) <- colnames(IB_volumes_for_R)[2:ncol(IB_volumes_for_R)]
+
+fit_results <- lapply(seq_along(fit_summs), function(x) {
+  data.frame(cyto <- names(fit_summs)[x],
+  Intercept <- fit_summs[[x]]$coefficients[1,1],
+  A <- fit_summs[[x]]$coefficients[2,1],
+  Int_P <- fit_summs[[x]]$coefficients[1,4],
+  A_P <- fit_summs[[x]]$coefficients[2,4],
+  rSquared <- fit_summs[[x]]$r.squared,
+  adjRSquared <- fit_summs[[x]]$adj.r.squared)
+})
+
+fits <- do.call(rbind, fit_results)
+write.csv(fits, file =  paste("~/Desktop/fits", Sys.time(),".csv"))
+
+```
