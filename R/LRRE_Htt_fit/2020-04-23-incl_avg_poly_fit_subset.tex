@@ -1,0 +1,301 @@
+\PassOptionsToPackage{unicode=true}{hyperref} % options for packages loaded elsewhere
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provides euro and other symbols
+\else % if luatex or xelatex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\usepackage{hyperref}
+\hypersetup{
+            pdftitle={Processing inclusion population data and polynomial fitting},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{Processing inclusion population data and polynomial fitting}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{library}\NormalTok{(dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\hypertarget{load-the-data-using-a-subset-of-the-inclusions}{%
+\subsection{Load the data (using a subset of the
+inclusions)}\label{load-the-data-using-a-subset-of-the-inclusions}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{radius <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/data/radius subset2.csv"}\NormalTok{, }\DataTypeTok{na =} \StringTok{"NA"}\NormalTok{)}
+
+\CommentTok{# omit last row}
+\NormalTok{radius <-}\StringTok{ }\NormalTok{radius[}\OperatorTok{-}\KeywordTok{nrow}\NormalTok{(radius),]}
+
+\NormalTok{area <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/data/area subset2.csv"}\NormalTok{, }\DataTypeTok{na =} \StringTok{"NA"}\NormalTok{)}
+\NormalTok{area <-}\StringTok{ }\NormalTok{area[}\OperatorTok{-}\KeywordTok{nrow}\NormalTok{(area),]}
+
+\NormalTok{volume <-}\StringTok{ }\KeywordTok{read.csv}\NormalTok{(}\StringTok{"/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/data/volume subset2.csv"}\NormalTok{, }\DataTypeTok{na =} \StringTok{"NA"}\NormalTok{)}
+\NormalTok{volume <-}\StringTok{ }\NormalTok{volume[}\OperatorTok{-}\KeywordTok{nrow}\NormalTok{(volume),]}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{for-all-datasets-calculate-average-and-sem-of-all-inclusions-at-each-timepoint}{%
+\subsection{For all datasets, calculate average and SEM of all
+inclusions at each
+timepoint}\label{for-all-datasets-calculate-average-and-sem-of-all-inclusions-at-each-timepoint}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# omitting the first column as it is the time}
+\NormalTok{radius_avg <-}\StringTok{ }\KeywordTok{rowMeans}\NormalTok{(radius[,}\OperatorTok{-}\DecValTok{1}\NormalTok{], }\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}
+
+\CommentTok{# apply the sem function across rows excluding the 1st column}
+\NormalTok{radius_sem <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(radius[,}\OperatorTok{-}\DecValTok{1}\NormalTok{], }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) (}\KeywordTok{sd}\NormalTok{(x, }\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}\OperatorTok{/}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{sum}\NormalTok{(}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(x)))))}
+                                                 
+\NormalTok{area_avg <-}\StringTok{ }\KeywordTok{rowMeans}\NormalTok{(area[,}\OperatorTok{-}\DecValTok{1}\NormalTok{], }\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{) }
+\NormalTok{area_sem <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(area[,}\OperatorTok{-}\DecValTok{1}\NormalTok{], }\DecValTok{1}\NormalTok{,}
+                  \ControlFlowTok{function}\NormalTok{(x) (}\KeywordTok{sd}\NormalTok{(x, }\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}\OperatorTok{/}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{sum}\NormalTok{(}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(x)))))}
+                                  
+\NormalTok{volume_avg <-}\StringTok{ }\KeywordTok{rowMeans}\NormalTok{(volume[,}\OperatorTok{-}\DecValTok{1}\NormalTok{], }\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}
+\NormalTok{volume_sem <-}\StringTok{ }\KeywordTok{apply}\NormalTok{(volume[,}\OperatorTok{-}\DecValTok{1}\NormalTok{], }\DecValTok{1}\NormalTok{, }\ControlFlowTok{function}\NormalTok{(x) (}\KeywordTok{sd}\NormalTok{(x, }\DataTypeTok{na.rm =} \OtherTok{TRUE}\NormalTok{)}\OperatorTok{/}\KeywordTok{sqrt}\NormalTok{(}\KeywordTok{sum}\NormalTok{(}\OperatorTok{!}\KeywordTok{is.na}\NormalTok{(x)))))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{fit-the-data-to-specified-functions}{%
+\subsection{Fit the data to specified
+functions}\label{fit-the-data-to-specified-functions}}
+
+\begin{verbatim}
+## [1] "radius fit with line, adj. R2: 0.989144038570202"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "radius fit to t^1/2: 0.835519499485319"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "radius fit to t^1/3: 0.688533497541656"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "area fit with t^2, adj. R2: 0.987034315643449"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "area fit with line, adj. R2: 0.951402032579113"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "area fit with t^2/3, adj. R2: 0.847463304087511"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "volume fit with t^3, adj. R2: 0.972530760577268"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "volume fit with t^3/2, adj. R2: 0.975033247623922"
+\end{verbatim}
+
+\begin{verbatim}
+## [1] "volume fit with line, adj. R2: 0.897431433949013"
+\end{verbatim}
+
+\hypertarget{generate-predictions-based-on-the-preferred-fits}{%
+\subsection{Generate predictions based on the preferred
+fits}\label{generate-predictions-based-on-the-preferred-fits}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Generate predicted values for the graph}
+
+\NormalTok{predict_radius <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{time =}\NormalTok{ times, }\DataTypeTok{radius =} \KeywordTok{predict}\NormalTok{(fit_radius_line, }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ times))))}
+
+\NormalTok{predict_area <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{time =}\NormalTok{ times, }\DataTypeTok{area =} \KeywordTok{predict}\NormalTok{(fit_area_deg2, }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ times))))}
+
+\NormalTok{predict_volume <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{time =}\NormalTok{ times, }\DataTypeTok{volume =} \KeywordTok{predict}\NormalTok{(fit_volume_deg3, }\KeywordTok{data.frame}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ times))))}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{plot-the-data-with-predictions}{%
+\subsection{Plot the data with
+predictions}\label{plot-the-data-with-predictions}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# radius }
+
+\CommentTok{# plot with prediction (fitted curve) and error bars from SEM}
+\NormalTok{radius_data <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{Time =}\NormalTok{ times, }\DataTypeTok{Radius =}\NormalTok{ radius_avg))}
+\NormalTok{plot_radius <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ radius_data, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ Time, }\DataTypeTok{y =}\NormalTok{ Radius)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme_classic}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{size =} \DecValTok{1}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{coord_cartesian}\NormalTok{(}\DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\FloatTok{0.6}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_errorbar}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{ymin =}\NormalTok{ radius_avg }\OperatorTok{-}\StringTok{ }\NormalTok{radius_sem, }\DataTypeTok{ymax =}\NormalTok{ radius_avg }\OperatorTok{+}\StringTok{ }\NormalTok{radius_sem),}
+                \DataTypeTok{width =} \FloatTok{0.1}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{color=}\StringTok{'black'}\NormalTok{,}\DataTypeTok{data =}\NormalTok{ predict_radius, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{time, }\DataTypeTok{y=}\NormalTok{radius))}
+
+\CommentTok{# show the plot }
+\NormalTok{plot_radius}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{2020-04-23-incl_avg_poly_fit_subset_files/figure-latex/plot-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# export the plot}
+\KeywordTok{ggsave}\NormalTok{(}\StringTok{"/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/plots/radius_subset2_plot.pdf"}\NormalTok{, }\DataTypeTok{plot =}\NormalTok{ plot_radius,}\DataTypeTok{device =} \KeywordTok{pdf}\NormalTok{(),}\DataTypeTok{width =} \DecValTok{4}\NormalTok{, }\DataTypeTok{height =} \DecValTok{3}\NormalTok{, }\DataTypeTok{units =} \StringTok{"in"}\NormalTok{,}\DataTypeTok{dpi =} \DecValTok{600}\NormalTok{)}
+
+\CommentTok{# area }
+
+\CommentTok{# plot with prediction (fitted curve) and error bars from SEM}
+\NormalTok{area_data <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{Time =}\NormalTok{ times, }\DataTypeTok{Area =}\NormalTok{ area_avg))}
+\NormalTok{plot_area <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ area_data, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ Time, }\DataTypeTok{y =}\NormalTok{ Area)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme_classic}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{coord_cartesian}\NormalTok{(}\DataTypeTok{ylim =} \KeywordTok{c}\NormalTok{(}\DecValTok{0}\NormalTok{,}\DecValTok{1}\NormalTok{)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{size =} \DecValTok{1}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_errorbar}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{ymin =}\NormalTok{ area_avg }\OperatorTok{-}\StringTok{ }\NormalTok{area_sem, }\DataTypeTok{ymax =}\NormalTok{ area_avg }\OperatorTok{+}\StringTok{ }\NormalTok{area_sem),}
+                \DataTypeTok{width =} \FloatTok{0.1}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{color=}\StringTok{'black'}\NormalTok{,}\DataTypeTok{data =}\NormalTok{ predict_area, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{time, }\DataTypeTok{y=}\NormalTok{area))}
+
+\CommentTok{# show the plot }
+\NormalTok{plot_area}
+
+\CommentTok{# export the plot}
+\KeywordTok{ggsave}\NormalTok{(}\StringTok{"/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/plots/area_subset2_plot.pdf"}\NormalTok{, }\DataTypeTok{plot =}\NormalTok{ plot_area,}\DataTypeTok{device =} \KeywordTok{pdf}\NormalTok{(),}\DataTypeTok{width =} \DecValTok{4}\NormalTok{, }\DataTypeTok{height =} \DecValTok{3}\NormalTok{, }\DataTypeTok{units =} \StringTok{"in"}\NormalTok{,}\DataTypeTok{dpi =} \DecValTok{600}\NormalTok{)}
+
+\CommentTok{# volume}
+
+\CommentTok{# plot with prediction (fitted curve) and error bars from SEM}
+\NormalTok{volume_data <-}\StringTok{ }\KeywordTok{as.data.frame}\NormalTok{(}\KeywordTok{cbind}\NormalTok{(}\DataTypeTok{Time =}\NormalTok{ times, }\DataTypeTok{Volume =}\NormalTok{ volume_avg))}
+\NormalTok{plot_volume <-}\StringTok{ }\KeywordTok{ggplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ volume_data, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x =}\NormalTok{ Time, }\DataTypeTok{y =}\NormalTok{ Volume)) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{theme_classic}\NormalTok{() }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_point}\NormalTok{(}\DataTypeTok{size =} \DecValTok{1}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_errorbar}\NormalTok{(}\KeywordTok{aes}\NormalTok{(}\DataTypeTok{ymin =}\NormalTok{ volume_avg }\OperatorTok{-}\StringTok{ }\NormalTok{volume_sem, }\DataTypeTok{ymax =}\NormalTok{ volume_avg }\OperatorTok{+}\StringTok{ }\NormalTok{volume_sem),}
+                \DataTypeTok{width =} \FloatTok{0.1}\NormalTok{) }\OperatorTok{+}
+\StringTok{  }\KeywordTok{geom_line}\NormalTok{(}\DataTypeTok{color=}\StringTok{'black'}\NormalTok{,}\DataTypeTok{data =}\NormalTok{ predict_volume, }\KeywordTok{aes}\NormalTok{(}\DataTypeTok{x=}\NormalTok{time, }\DataTypeTok{y=}\NormalTok{volume))}
+
+\CommentTok{# show the plot }
+\NormalTok{plot_volume}
+
+\CommentTok{# export the plot}
+\KeywordTok{ggsave}\NormalTok{(}\StringTok{"/Users/theresaswayne/Documents/GitHub/data-analysis/R/LRRE_Htt_fit/plots/volume_subset2_plot.pdf"}\NormalTok{, }\DataTypeTok{plot =}\NormalTok{ plot_volume,}\DataTypeTok{device =} \KeywordTok{pdf}\NormalTok{(),}\DataTypeTok{width =} \DecValTok{4}\NormalTok{, }\DataTypeTok{height =} \DecValTok{3}\NormalTok{, }\DataTypeTok{units =} \StringTok{"in"}\NormalTok{,}\DataTypeTok{dpi =} \DecValTok{600}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\end{document}
