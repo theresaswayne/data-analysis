@@ -21,7 +21,8 @@ existing <- installed.packages()
 need_to_install <- setdiff(faves, existing[,1])
 
 # Update existing packages before installing anything new ------
-update.packages()
+# checkBuilt parameter added for R 4.0
+update.packages(checkBuilt=TRUE)
 
 
 
