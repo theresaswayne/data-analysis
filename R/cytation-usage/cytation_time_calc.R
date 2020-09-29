@@ -8,8 +8,9 @@
 
 # ---- Setup ----
 
-require(tidyverse) # for reading and parsing
-require(tcltk) # for file choosing
+library(tidyverse) # for reading and parsing
+library(readr)
+library(tcltk) # for file choosing
 
 # ---- User chooses the input file ----
 
