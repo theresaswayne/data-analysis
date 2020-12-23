@@ -18,7 +18,7 @@ logfile <- tk_choose.files(default = "", caption = "Select the BioSpa log file",
 
 # capture the date of the logfile, which is the base filename in YYYY-MM-DD format
 
-date <-  file_path_sans_ext(basename(logfile)) # in character format
+logDate <-  file_path_sans_ext(basename(logfile)) # in character format
 
 # read the data
 
@@ -28,18 +28,26 @@ logdata <- read_delim(logfile,
                           col_types = cols(Timestamp = col_character()), 
                           trim_ws = TRUE)
 
+# --- Make the timestamp column into a proper date and time ---
 
+# remove the day of the week (1st 5 chars)
+logdata$Timestamp <- substr(logdata$Timestamp,5,nchar(logdata$Timestamp))
 
-# translate timestamp into time object
+# add the date from the filename, and a space
+logdata$Timestamp <- (sub("^", paste(logDate, " "), logdata$Timestamp))
 
-logdata <- logdata %>% mutate() <- as.POSIXct(logdata$Timestamp, format = '%a %H:%M:%S')
+# translate the column into POSIXct time format
+logdata$Timestamp <- as.POSIXct(logdata$Timestamp, format = '%Y_%m_%d %H:%M:%S')
+
 
 # test if time is accurately calculated
 # double brackets retrieve values rather than 1x1 tibbles
 
-testtime <- difftime(logdata[[2,2]], logdata[[1,2]])
+testtime <- difftime(logdata[[2,2]], logdata[[1,2]], units = "mins")
 
-# TODO from the above we get "Error in as.POSIXlt.character(x, tz, ...) :  character string is not in a standard unambiguous format" -- perhaps we need to strip the day
+
+# TODO from the above we get "Error in as.POSIXlt.character(x, tz, ...) :  character string is not in a standard unambiguous format" -- perhaps we need to strip the day.Or better yet add the date which we know and make it a proper datetime object
+
 
  
 
