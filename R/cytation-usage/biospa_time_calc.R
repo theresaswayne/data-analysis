@@ -39,21 +39,35 @@ logdata$Timestamp <- (sub("^", paste(logDate, " "), logdata$Timestamp))
 # translate the column into POSIXct time format
 logdata$Timestamp <- as.POSIXct(logdata$Timestamp, format = '%Y_%m_%d %H:%M:%S')
 
-
-# test if time is accurately calculated
+# TEST if time is accurately calculated
 # double brackets retrieve values rather than 1x1 tibbles
 
-testtime <- difftime(logdata[[2,2]], logdata[[1,2]], units = "mins")
+testtime <- as.numeric(difftime(logdata[[2,2]], logdata[[1,2]], units = "hours"))
+
+# TODO Filter for begun and completed rows
+
+imagingTimes <- logdata %>% 
+  filter(grepl("has begun|has completed", Notes))
 
 
-# TODO from the above we get "Error in as.POSIXlt.character(x, tz, ...) :  character string is not in a standard unambiguous format" -- perhaps we need to strip the day.Or better yet add the date which we know and make it a proper datetime object
+# TODO Get plate number into a column
+# TODO Get protocol into a column 
+# TODO Get imaging run number into a column
 
-
- 
-
-
-# # add a column for the Read number to help with merging the data later 
+# startTimes <- logdata_unique %>% 
+#   filter(grepl("started", Event)) %>%
+#   select(Start = Date)  %>%
+#   mutate(Read = row_number())
 # 
+# endTimes <- logdata_unique %>% 
+#   filter(grepl("completed", Event)) %>%
+#   select(End = Date)  %>%
+#   mutate(Read = row_number())
+
+# TODO Calculate difftime for each run
+# TODO Sum imaging times per protocol and plate (note 2 plates can run same protocol and 2 users may use the sample plate pos in a day)
+
+
 # startTimes <- logdata_unique %>% 
 #   filter(grepl("started", Event)) %>%
 #   select(Start = Date)  %>%
