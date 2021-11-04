@@ -9,7 +9,8 @@ faves <- c("here", # for easy relative paths
            "swirl",  # for tutorials 
            "tidyverse",
            "BiocManager", # Bioconductor 
-           "devtools")  # needed for Bioconductor and SMoLR
+           "devtools", # needed for Bioconductor and SMoLR
+           "manipulateWidget")  # needed for SMoLR
 
 # tidyverse core includes readr, dplyr, tidyr, purrr, stringr, tibble, forcats, ggplot2
 
