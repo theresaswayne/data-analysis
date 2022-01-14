@@ -5,6 +5,8 @@
 # Note -- include only the audit trail. No procedure summary or other info.
 # Date and time use the default Gen5 format.
 
+# Caveat -- output contains multiple lines per protocol. Use the last line of each one.
+# TODO: eliminate this behavior by truncating the initial timestamp from the text file name
 
 # ---- Setup ----
 
