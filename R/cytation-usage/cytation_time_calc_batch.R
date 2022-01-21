@@ -6,7 +6,11 @@
 # Date and time use the default Gen5 format.
 
 # Caveat -- output contains multiple lines per protocol. Use the last line of each one.
-# TODO: eliminate this behavior by truncating the initial timestamp from the text file name
+# TODO: eliminate this behavior by either 
+#      selecting unique reads by start time, or 
+#      removing the beginning of each text file name (since these are not unique by protocol), or
+#      eliminating all but the last read per protocol (the one with most lines)
+# TODO: how to distinguish multiple plates with same protocol vs multiple runs of same plate? File suffix?
 
 # ---- Setup ----
 
@@ -39,13 +43,16 @@ logdata <- unnest(mergedDataWithNames, cols=c(file_contents)) # added in respons
 
 # ---- Find start and end times ----
 
-# remove duplicate lines logged during discontinuous kinetic procedures
+# sort by filename and then date; since merged data is not automatically in order.
+arrange(logdata, filename, Date)
 
-logdata_unique <- unique(logdata)
+# remove lines representing duplication of the same read, 
+# which are present in multiple files
+logdata_unique <- distinct(logdata, Date, .keep_all = TRUE)
 
 # add a column for the Read number to help with merging the data later 
 # read numbers are consecutive through all the log files
- 
+
 startTimes <- logdata_unique %>% 
   filter(grepl("started", Event)) %>%
   select(filename, Start = Date)  %>%
@@ -56,25 +63,32 @@ endTimes <- logdata_unique %>%
   select(filename, End = Date)  %>%
   mutate(Read = row_number())
 
-
 # combine start and end times so each row represents a single read step
 
 scanTimes <- full_join(startTimes, endTimes, by = "Read") %>% # combine using original read number
   mutate(filename = filename.x) %>% # get rid of duplicate columns
   select(-c(filename.y, filename.x))
 
-# ---- Calculate elapsed time and save ----
+# ---- Calculate elapsed time ----
 
 scanTimes <- scanTimes %>% 
   mutate(elapsedTime = difftime(End, Start, units = "hours")) # convert elapsedTime to hours
 
+# calculate active time for each experiment (represented by 1 unique filename suffix)
+
+# create a column representing the filename after the timestamp characters
+
+scanTimes <- scanTimes %>% 
+  mutate(Expt = substring(filename, 15))
+
 # filter out NAs that arise from aborted runs
-# calculate active time for each experiment (represented by 1 logfile)
 
 scanTimeTotal <-  scanTimes %>%
-  group_by(filename) %>%
+  group_by(Expt) %>%
   filter(is.na(elapsedTime) == FALSE) %>%
   summarise(TotalHours = sum(elapsedTime)) 
+
+# ---- Output ----
 
 # save results in the parent of the log directory 
 
