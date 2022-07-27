@@ -11,14 +11,23 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 4. normalize data
 5. update charts
 
--- 
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
 
-```{r}
-plot(cars)
+```{r setup}
+require(tidyverse) # for reading and parsing
+require(tcltk) # for file choosing
+require(here) # for file choosing
 ```
 
-Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+# Input
+The Sample Data folder contains examples of files in the correct format.
+
+. an existing csv with data fitting the format
+. sewershed data from CDC
+. case, positivity, and hospitalization data from NYC
+
+```{r choose data file}
+
+```
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
 
