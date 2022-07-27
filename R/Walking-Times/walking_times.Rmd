@@ -1,0 +1,169 @@
+---
+title: "Walk into the light"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+
+1. Define Good walking time as up to halfway through civil twilight
+
+2. Check 3 work schedules from 8:30 to 9:30 assuming time to train and walk are constant. (Ignore actual train times). Find: a. The single schedule that gives the most lighted walks total. b,c. The single schedule that gives the most lighted morning and evening walks respectively. D. The schedule calendars that give the most light total, morning, and evening walks respectively.
+3. Repeat #1 for different clock schemes. (Regular, all daylight and all standard)
+4. Check work schedules based on actual train times in the vicinity of normal hours.
+
+Plan. 
+1. Make a table with dates spanning new year. Summer is not interesting. Have it be July 1-Jun 30. 
+2. For each day calculate the midpoint of civil twilight as the first/last light moment
+2. For each work sched find the time of leaving home and arriving home 
+3. If these times occur during light score 1 for morning or evening respectively 
+4. Total the morning, evening, and sum scores for each single work schedule
+5. Find optimal shifts — maximize both-trips light and then morning light, minimize changes — go to the last possible day in fall with both-trips light— then shift to the time that gives morning light — then as soon as both-times light becomes available in spring, shift back to that.     Last day in fall = max date value in the 1st year with sum of score columns =2.  Or min date with sum = 1. First day in spring = latest date with sum = 1. Winter Morning light shift = looking between these prev determined dates, find the shift with the highest total in the morning column.
+
+	
+Previous conclusions:
+Best walking times during the year
+
+Premise: total commute ~ 90 min, walking time 30 min, work day 8 hr, sometime in the vicinity of 8 am - 6 pm
+
+Standard time, February and early March — early sunrise; sunset roughly 5-5:30 —> 8 am - 4 pm allows 
+
+Start of edt in March — sunrise 7 am —> 8:30-4:30
+
+Start of est in November — sunset too early, stay with 8:30-4:30 to keep closer to normal hours 
+
+
+IF normal clock is used:  
+
+Jan 1	1st light 6:49 last light 5:09 — 
+	9-5 morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30   morning light
+
+Feb 1 	6:36 - 5:41 —
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30   morning light
+
+Mar 1	6:02 - 6:14 —
+	9 - 5 ok both ways
+	9:30 - 5:30   morning light
+	8:30 - 4:30 ok both ways
+
+Apr - Sept doesn’t matter
+
+Oct 1 	6:24 - 7:04 —
+	9 - 5 ok both ways
+	9:30 - 5:30 ok both ways
+	8:30 - 4:30 ok both ways
+
+Nov 1 	6:57 - 6:19 —
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30 ok both ways
+
+Nov 6	6:03 - 5:14 — 
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30   morning light
+
+Dec 1	6:30 - 4:58 —
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30   morning light
+
+4 mo. of dark evening commute (Nov - Feb)
+
+IF daylight time is all year:  
+
+Jan 1	1st light 7:49 last light 6:09 — 
+	9-5 dark both ways
+	9:30 - 5:30   morning light
+	8:30 - 4:30   evening light
+
+Feb 1 	7:36 - 6:41 —
+	9 - 5 ok both ways
+	9:30 - 5:30   morning light
+	8:30 - 4:30   evening light
+
+Mar 1	7:02 - 7:14 —
+	9 - 5 ok both ways
+	9:30 - 5:30 ok both ways
+	8:30 - 4:30   evening light
+
+Apr - Sept doesn’t matter
+
+Oct 1 	6:24 - 7:04 —
+	9 - 5 ok both ways
+	9:30 - 5:30 ok both ways
+	8:30 - 4:30 ok both ways
+
+Nov 1 	6:57 - 6:19 —
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30 ok both ways
+
+Dec 1	7:30 - 5:58 —
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30   evening light
+
+2 months of dark evening (Dec - Jan)
+
+IF standard time is all year:  
+
+Jan 1	1st light 6:49 last light 5:09 — 
+	9-5 morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30   morning light
+
+Feb 1 	6:36 - 5:41 —
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30   morning light
+
+Mar 1	6:02 - 6:14 —
+	9 - 5 ok both ways
+	9:30 - 5:30   morning light
+	8:30 - 4:30 ok both ways
+
+Apr - Sept doesn’t matter
+
+Oct 1 	5:24 - 6:04 —
+	9 - 5 morning light
+	9:30 - 5:30 morning light
+	8:30 - 4:30 ok both ways
+
+Nov 1 	5:57 - 5:19 —
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30 morning light
+
+Dec 1	6:30 - 4:58 —
+	9 - 5   morning light
+	9:30 - 5:30   morning light
+	8:30 - 4:30   morning light
+
+5 months of dark evening commute (Oct - Feb), no dark mornings
+
+Twilight: Twilight is the period of time before sunrise and again after sunset, during which sunlight is scattered by the Earth’s upper atmosphere and provides significant illumination. The qualitative descriptions of civil, nautical and astronomical twilight will match the computed beginning and ending times for an observer near sea level, with good weather conditions and a level horizon. 
+
+“ By the midpoint, you can read a newspaper outside under open sky. Pedestrians no longer need a light but would probably want reflectors or bright clothing if they’re near traffic, especially on an overcast day.”
+
+“…a bit longer in summer and winter and is a bit shorter in spring and fall. … Civil twilight in mid latitudes can last, on average, 1/2 hour.”
+
+https://aa.usno.navy.mil/data/index
+
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+```{r}
+plot(cars)
+```
+
+Add a new chunk by clicking the *Insert Chunk* button on the toolbar or by pressing *Cmd+Option+I*.
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+
+The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+
