@@ -7,6 +7,7 @@ This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute
 
 1. take existing data from spreadsheets
 2. take new simple data from typed entry
+(possibly -- scrape from the web)
 3. take new complex data (sewershed) from documents in the folder
 4. normalize data
 5. update charts
@@ -25,7 +26,17 @@ The Sample Data folder contains examples of files in the correct format.
 . sewershed data from CDC
 . case, positivity, and hospitalization data from NYC
 
-```{r choose data file}
+```{r identify data files}
+
+# ---- User chooses the input folder ----
+
+datafolder <- tk_choose.dir(default = "", caption = "OPEN the folder with source data") # prompt user
+
+files <- dir(datafolder, pattern = "*.csv") # Get a list of csv files in the folder
+
+wastewaterFiles <- files[grepl("sarscov-2_rna_levels")]
+# X[grepl("^m.*\\.log", X)]
+
 
 ```
 

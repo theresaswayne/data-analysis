@@ -222,7 +222,7 @@ pre code {
 <p>This is an <a href="http://rmarkdown.rstudio.com">R Markdown</a> Notebook. When you execute code within the notebook, the results appear beneath the code.</p>
 <ol style="list-style-type: decimal">
 <li>take existing data from spreadsheets</li>
-<li>take new simple data from typed entry</li>
+<li>take new simple data from typed entry (possibly – scrape from the web)</li>
 <li>take new complex data (sewershed) from documents in the folder</li>
 <li>normalize data</li>
 <li>update charts</li>
@@ -234,6 +234,10 @@ pre code {
 require(tcltk) # for file choosing
 require(here) # for file choosing</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiTG9hZGluZyByZXF1aXJlZCBwYWNrYWdlOiBoZXJlXG5oZXJlKCkgc3RhcnRzIGF0IC9Vc2Vycy90Y3M2L0RvY3VtZW50cy9HaXRIdWIvZGF0YS1hbmFseXNpc1xuIn0= -->
+<pre><code>Loading required package: here
+here() starts at /Users/tcs6/Documents/GitHub/data-analysis</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <div id="input" class="section level1">
@@ -242,6 +246,21 @@ require(here) # for file choosing</code></pre>
 <p>. an existing csv with data fitting the format . sewershed data from CDC . case, positivity, and hospitalization data from NYC</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG4jIC0tLS0gVXNlciBjaG9vc2VzIHRoZSBpbnB1dCBmb2xkZXIgLS0tLVxuXG5kYXRhZm9sZGVyIDwtIHRrX2Nob29zZS5kaXIoZGVmYXVsdCA9IFwiXCIsIGNhcHRpb24gPSBcIk9QRU4gdGhlIGZvbGRlciB3aXRoIHNvdXJjZSBkYXRhXCIpICMgcHJvbXB0IHVzZXJcblxuZmlsZXMgPC0gZGlyKGRhdGFmb2xkZXIsIHBhdHRlcm4gPSBcIiouY3N2XCIpICMgR2V0IGEgbGlzdCBvZiBjc3YgZmlsZXMgaW4gdGhlIGZvbGRlclxuXG53YXN0ZXdhdGVyRmlsZXMgPC0gZmlsZXMgJT4lXG4gIEZpbHRlcihcInNhcnNjb3YtMl9ybmFfbGV2ZWxzXCIpXG5gYGAifQ== -->
+<pre class="r"><code>
+# ---- User chooses the input folder ----
+
+datafolder &lt;- tk_choose.dir(default = &quot;&quot;, caption = &quot;OPEN the folder with source data&quot;) # prompt user
+
+files &lt;- dir(datafolder, pattern = &quot;*.csv&quot;) # Get a list of csv files in the folder
+
+wastewaterFiles &lt;- files %&gt;%
+  Filter(&quot;sarscov-2_rna_levels&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiRXJyb3IgaW4gZ2V0KGFzLmNoYXJhY3RlcihGVU4pLCBtb2RlID0gXCJmdW5jdGlvblwiLCBlbnZpciA9IGVudmlyKSA6IFxuICBvYmplY3QgJ2YnIG9mIG1vZGUgJ2Z1bmN0aW9uJyB3YXMgbm90IGZvdW5kXG4ifQ== -->
+<pre><code>Error in get(as.character(FUN), mode = &quot;function&quot;, envir = envir) : 
+  object &#39;f&#39; of mode &#39;function&#39; was not found</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <p>When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the <em>Preview</em> button or press <em>Cmd+Shift+K</em> to preview the HTML file).</p>
@@ -249,7 +268,7 @@ require(here) # for file choosing</code></pre>
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiTllDIENPVklEIERhdGEiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KClRoaXMgaXMgYW4gW1IgTWFya2Rvd25dKGh0dHA6Ly9ybWFya2Rvd24ucnN0dWRpby5jb20pIE5vdGVib29rLiBXaGVuIHlvdSBleGVjdXRlIGNvZGUgd2l0aGluIHRoZSBub3RlYm9vaywgdGhlIHJlc3VsdHMgYXBwZWFyIGJlbmVhdGggdGhlIGNvZGUuIAoKMS4gdGFrZSBleGlzdGluZyBkYXRhIGZyb20gc3ByZWFkc2hlZXRzCjIuIHRha2UgbmV3IHNpbXBsZSBkYXRhIGZyb20gdHlwZWQgZW50cnkKMy4gdGFrZSBuZXcgY29tcGxleCBkYXRhIChzZXdlcnNoZWQpIGZyb20gZG9jdW1lbnRzIGluIHRoZSBmb2xkZXIKNC4gbm9ybWFsaXplIGRhdGEKNS4gdXBkYXRlIGNoYXJ0cwoKCmBgYHtyIHNldHVwfQpyZXF1aXJlKHRpZHl2ZXJzZSkgIyBmb3IgcmVhZGluZyBhbmQgcGFyc2luZwpyZXF1aXJlKHRjbHRrKSAjIGZvciBmaWxlIGNob29zaW5nCnJlcXVpcmUoaGVyZSkgIyBmb3IgZmlsZSBjaG9vc2luZwpgYGAKCiMgSW5wdXQKVGhlIFNhbXBsZSBEYXRhIGZvbGRlciBjb250YWlucyBleGFtcGxlcyBvZiBmaWxlcyBpbiB0aGUgY29ycmVjdCBmb3JtYXQuCgouIGFuIGV4aXN0aW5nIGNzdiB3aXRoIGRhdGEgZml0dGluZyB0aGUgZm9ybWF0Ci4gc2V3ZXJzaGVkIGRhdGEgZnJvbSBDREMKLiBjYXNlLCBwb3NpdGl2aXR5LCBhbmQgaG9zcGl0YWxpemF0aW9uIGRhdGEgZnJvbSBOWUMKCmBgYHtyIGNob29zZSBkYXRhIGZpbGV9CgpgYGAKCldoZW4geW91IHNhdmUgdGhlIG5vdGVib29rLCBhbiBIVE1MIGZpbGUgY29udGFpbmluZyB0aGUgY29kZSBhbmQgb3V0cHV0IHdpbGwgYmUgc2F2ZWQgYWxvbmdzaWRlIGl0IChjbGljayB0aGUgKlByZXZpZXcqIGJ1dHRvbiBvciBwcmVzcyAqQ21kK1NoaWZ0K0sqIHRvIHByZXZpZXcgdGhlIEhUTUwgZmlsZSkuIAoKVGhlIHByZXZpZXcgc2hvd3MgeW91IGEgcmVuZGVyZWQgSFRNTCBjb3B5IG9mIHRoZSBjb250ZW50cyBvZiB0aGUgZWRpdG9yLiBDb25zZXF1ZW50bHksIHVubGlrZSAqS25pdCosICpQcmV2aWV3KiBkb2VzIG5vdCBydW4gYW55IFIgY29kZSBjaHVua3MuIEluc3RlYWQsIHRoZSBvdXRwdXQgb2YgdGhlIGNodW5rIHdoZW4gaXQgd2FzIGxhc3QgcnVuIGluIHRoZSBlZGl0b3IgaXMgZGlzcGxheWVkLgoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiTllDIENPVklEIERhdGEiCm91dHB1dDogaHRtbF9ub3RlYm9vawotLS0KClRoaXMgaXMgYW4gW1IgTWFya2Rvd25dKGh0dHA6Ly9ybWFya2Rvd24ucnN0dWRpby5jb20pIE5vdGVib29rLiBXaGVuIHlvdSBleGVjdXRlIGNvZGUgd2l0aGluIHRoZSBub3RlYm9vaywgdGhlIHJlc3VsdHMgYXBwZWFyIGJlbmVhdGggdGhlIGNvZGUuIAoKMS4gdGFrZSBleGlzdGluZyBkYXRhIGZyb20gc3ByZWFkc2hlZXRzCjIuIHRha2UgbmV3IHNpbXBsZSBkYXRhIGZyb20gdHlwZWQgZW50cnkKKHBvc3NpYmx5IC0tIHNjcmFwZSBmcm9tIHRoZSB3ZWIpCjMuIHRha2UgbmV3IGNvbXBsZXggZGF0YSAoc2V3ZXJzaGVkKSBmcm9tIGRvY3VtZW50cyBpbiB0aGUgZm9sZGVyCjQuIG5vcm1hbGl6ZSBkYXRhCjUuIHVwZGF0ZSBjaGFydHMKCgpgYGB7ciBzZXR1cH0KcmVxdWlyZSh0aWR5dmVyc2UpICMgZm9yIHJlYWRpbmcgYW5kIHBhcnNpbmcKcmVxdWlyZSh0Y2x0aykgIyBmb3IgZmlsZSBjaG9vc2luZwpyZXF1aXJlKGhlcmUpICMgZm9yIGZpbGUgY2hvb3NpbmcKYGBgCgojIElucHV0ClRoZSBTYW1wbGUgRGF0YSBmb2xkZXIgY29udGFpbnMgZXhhbXBsZXMgb2YgZmlsZXMgaW4gdGhlIGNvcnJlY3QgZm9ybWF0LgoKLiBhbiBleGlzdGluZyBjc3Ygd2l0aCBkYXRhIGZpdHRpbmcgdGhlIGZvcm1hdAouIHNld2Vyc2hlZCBkYXRhIGZyb20gQ0RDCi4gY2FzZSwgcG9zaXRpdml0eSwgYW5kIGhvc3BpdGFsaXphdGlvbiBkYXRhIGZyb20gTllDCgpgYGB7ciBpZGVudGlmeSBkYXRhIGZpbGVzfQoKIyAtLS0tIFVzZXIgY2hvb3NlcyB0aGUgaW5wdXQgZm9sZGVyIC0tLS0KCmRhdGFmb2xkZXIgPC0gdGtfY2hvb3NlLmRpcihkZWZhdWx0ID0gIiIsIGNhcHRpb24gPSAiT1BFTiB0aGUgZm9sZGVyIHdpdGggc291cmNlIGRhdGEiKSAjIHByb21wdCB1c2VyCgpmaWxlcyA8LSBkaXIoZGF0YWZvbGRlciwgcGF0dGVybiA9ICIqLmNzdiIpICMgR2V0IGEgbGlzdCBvZiBjc3YgZmlsZXMgaW4gdGhlIGZvbGRlcgoKd2FzdGV3YXRlckZpbGVzIDwtIGZpbGVzW2dyZXBsKCJzYXJzY292LTJfcm5hX2xldmVscyIpXQojIFhbZ3JlcGwoIl5tLipcXC5sb2ciLCBYKV0KCgpgYGAKCldoZW4geW91IHNhdmUgdGhlIG5vdGVib29rLCBhbiBIVE1MIGZpbGUgY29udGFpbmluZyB0aGUgY29kZSBhbmQgb3V0cHV0IHdpbGwgYmUgc2F2ZWQgYWxvbmdzaWRlIGl0IChjbGljayB0aGUgKlByZXZpZXcqIGJ1dHRvbiBvciBwcmVzcyAqQ21kK1NoaWZ0K0sqIHRvIHByZXZpZXcgdGhlIEhUTUwgZmlsZSkuIAoKVGhlIHByZXZpZXcgc2hvd3MgeW91IGEgcmVuZGVyZWQgSFRNTCBjb3B5IG9mIHRoZSBjb250ZW50cyBvZiB0aGUgZWRpdG9yLiBDb25zZXF1ZW50bHksIHVubGlrZSAqS25pdCosICpQcmV2aWV3KiBkb2VzIG5vdCBydW4gYW55IFIgY29kZSBjaHVua3MuIEluc3RlYWQsIHRoZSBvdXRwdXQgb2YgdGhlIGNodW5rIHdoZW4gaXQgd2FzIGxhc3QgcnVuIGluIHRoZSBlZGl0b3IgaXMgZGlzcGxheWVkLgoK</div>
 
 
 
