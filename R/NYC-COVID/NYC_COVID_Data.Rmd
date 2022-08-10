@@ -34,10 +34,11 @@ datafolder <- tk_choose.dir(default = "", caption = "OPEN the folder with source
 
 files <- dir(datafolder, pattern = "*.csv") # Get a list of csv files in the folder
 
-wastewaterFiles <- files[grepl("sarscov-2_rna_levels")]
-# X[grepl("^m.*\\.log", X)]
+wastewaterFiles <- files[grepl("sarscov-2_rna_levels", files)]
+# wastewaterFiles <- files[grepl("838", files)]
 
-
+print("we have the following wastewater data files:")
+wastewaterFiles
 ```
 
 When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
