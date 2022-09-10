@@ -11,6 +11,7 @@
 
 require(tidyverse) # for reading and parsing
 require(tcltk) # for file choosing
+require(slider) # for checking for valid start/end times
 
 # ---- User chooses the input folder ----
 
@@ -20,7 +21,7 @@ logfolder <- tk_choose.dir(default = "", caption = "OPEN the folder with log dat
 
 files <- dir(logfolder, pattern = "*.txt") 
 
-# Read the data -- parsing errors may occur but data should be read ok.
+# Read the data -- parsing errors may be shown but data should be read ok.
 
 mergedDataWithNames <- tibble(filename = files) %>% # column 1 = file names
   mutate(file_contents =
@@ -33,8 +34,7 @@ mergedDataWithNames <- tibble(filename = files) %>% # column 1 = file names
 
 # make the list into a flat file -- each row contains its source filename
 
-logdata <- unnest(mergedDataWithNames, cols=c(file_contents)) # added in response to 'cols is now required' error
-
+logdata <- unnest(mergedDataWithNames, cols=c(file_contents)) 
 
 # ---- Find start and end times ----
 
@@ -42,31 +42,37 @@ logdata <- unnest(mergedDataWithNames, cols=c(file_contents)) # added in respons
 # which are present in multiple files
 logdata_unique <- distinct(logdata, Date, .keep_all = TRUE)
 
-# create a column representing the filename after the timestamp characters
+# create a column representing the Experiment base name
+# obtained from the audit trail filename after ignoring the 14 characters in the timestamp
 logdata_unique <- logdata_unique %>% 
   mutate(Expt = substring(filename, 15))
 
-# sort in order of experiment then read; since merged data is not automatically in order.
-arrange(logdata_unique, Expt, filename, Date)
+# remove unnecessary lines
+start_endTimes <- logdata_unique %>% 
+  filter(grepl("started|completed", Event))
 
-# add a column for the Read number to help with merging the data later 
-# read numbers are consecutive through all the log files
+# sort in order of experiment then time; since merged data is not automatically in order.
+# arrange(logdata_unique, Expt, filename, Date)
+# sort by time of actual read (Date) before filename which only includes time in character form
+arrange(start_endTimes, Date, filename, Expt)
 
-startTimes <- logdata_unique %>% 
-  filter(grepl("started", Event)) %>%
-  select(filename, Start = Date, Expt)  %>%
+endTimes <- filter(start_endTimes, 
+       (Event == "Plate read successfully completed" & lag(Event) == "Plate read started")) %>%
   mutate(Read = row_number())
 
-endTimes <- logdata_unique %>% 
-  filter(grepl("completed", Event)) %>%
-  select(filename, End = Date)  %>%
+startTimes <- filter(start_endTimes, 
+                     (Event == "Plate read started" & lead(Event) == "Plate read successfully completed")) %>%
   mutate(Read = row_number())
 
-# combine start and end times so each row represents a single read step
+scanTimesRaw <- full_join(startTimes, endTimes, by = "Read")
 
-scanTimes <- full_join(startTimes, endTimes, by = "Read") %>% # combine using original read number
-  mutate(filename = filename.x) %>% # get rid of duplicate columns
-  select(-c(filename.y, filename.x))
+scanTimes <- scanTimesRaw %>%
+  mutate(Filename = filename.x, 
+         User = User.x, 
+         Start = Date.x, 
+         End = Date.y,
+         Expt = Expt.x) %>% 
+  select(Filename, User, Start, End, Expt) # get rid of duplicate columns
 
 # ---- Calculate elapsed time ----
 
