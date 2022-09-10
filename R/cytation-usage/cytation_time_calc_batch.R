@@ -5,13 +5,10 @@
 # Note -- include only the audit trail. No procedure summary or other info.
 # Date and time use the default Gen5 format "10/1/2021 2:49:43 PM"
 
-# Caveat -- Check for errors in the text files. Aborted reads can result in incorrect calculations.
-
 # ---- Setup ----
 
-require(tidyverse) # for reading and parsing
+require(tidyverse) # for reading and parsing, lead/lag
 require(tcltk) # for file choosing
-require(slider) # for checking for valid start/end times
 
 # ---- User chooses the input folder ----
 
@@ -47,50 +44,46 @@ logdata_unique <- distinct(logdata, Date, .keep_all = TRUE)
 logdata_unique <- logdata_unique %>% 
   mutate(Expt = substring(filename, 15))
 
-# remove unnecessary lines
+# remove unnecessary lines -- keep only the times when reads are started and completed 
 start_endTimes <- logdata_unique %>% 
   filter(grepl("started|completed", Event))
 
-# sort in order of experiment then time; since merged data is not automatically in order.
-# arrange(logdata_unique, Expt, filename, Date)
-# sort by time of actual read (Date) before filename which only includes time in character form
+# sort by time of actual read (Date)
 arrange(start_endTimes, Date, filename, Expt)
 
+# save only the completion times that have a started read immediately before
 endTimes <- filter(start_endTimes, 
        (Event == "Plate read successfully completed" & lag(Event) == "Plate read started")) %>%
-  mutate(Read = row_number())
+  mutate(Read = row_number()) # this column will help us match start and end times
 
+# save only the start times that have a completed read immediately after
 startTimes <- filter(start_endTimes, 
                      (Event == "Plate read started" & lead(Event) == "Plate read successfully completed")) %>%
   mutate(Read = row_number())
 
 scanTimesRaw <- full_join(startTimes, endTimes, by = "Read")
 
+# identify start and end times, and remove duplicate columns
 scanTimes <- scanTimesRaw %>%
   mutate(Filename = filename.x, 
          User = User.x, 
          Start = Date.x, 
          End = Date.y,
          Expt = Expt.x) %>% 
-  select(Filename, User, Start, End, Expt) # get rid of duplicate columns
+  select(Filename, User, Start, End, Expt)
 
 # ---- Calculate elapsed time ----
 
 scanTimes <- scanTimes %>% 
-  mutate(elapsedTime = difftime(End, Start, units = "hours")) # convert elapsedTime to hours
+  mutate(elapsedTime = difftime(End, Start, units = "hours"))
 
-# calculate active time for each experiment (represented by 1 unique filename suffix)
-
-# Sort by expt and start time
-
+# sort just before grouping and summarizing
 scanTimes <- scanTimes %>% 
   arrange(Expt, Start)
 
-# filter out NAs that arise from aborted runs
-
+# calculate total per experiment (plate)
 scanTimeTotal <-  scanTimes %>%
   group_by(Expt) %>%
-  filter(is.na(elapsedTime) == FALSE) %>%
   summarise(TotalHours = sum(elapsedTime)) 
 
 # ---- Output ----
@@ -98,12 +91,10 @@ scanTimeTotal <-  scanTimes %>%
 # save results in the parent of the log directory 
 
 parentName <- basename(dirname(logfolder)) # name of the log directory without higher levels
-
 parentDir <- dirname(logfolder) # parent of the log directory
 
-outputFileTotal = paste(Sys.Date(), basename(logfolder), "_totals.csv") # spaces will be inserted
-outputFile = paste(Sys.Date(), basename(logfolder), "_times.csv") # spaces will be inserted
-
-write_csv(scanTimeTotal,file.path(parentDir, outputFileTotal))
+outputFile = paste(Sys.Date(), basename(logfolder), "_times.csv") 
 write_csv(scanTimes,file.path(parentDir, outputFile))
 
+outputFileTotal = paste(Sys.Date(), basename(logfolder), "_totals.csv")
+write_csv(scanTimeTotal,file.path(parentDir, outputFileTotal))
