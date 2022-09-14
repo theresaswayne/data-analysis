@@ -1,30 +1,27 @@
 ---
-title: "NYC COVID Data"
+title: "COVID Data"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+Purpose: To collect different local indicators of COVID prevalence and severity, and display them together.
 
-1. take existing data from spreadsheets
-2. take new simple data from typed entry
-(possibly -- scrape from the web)
-3. take new complex data (sewershed) from documents in the folder
-4. normalize data
-5. update charts
-
+#. take files containing CDC wastewater data from individual sewersheds
+#. [TODO] take new simple data from typed entry or from the web
+#. normalize data to a given date
+#. plot the data over time
 
 ```{r setup}
 require(tidyverse) # for reading and parsing
 require(tcltk) # for file choosing
 require(here) # for file choosing
+
 ```
 
 # Input
-The Sample Data folder contains examples of files in the correct format.
+The Sample Data folder will contain examples of files in the correct format.
 
-. an existing csv with data fitting the format
 . sewershed data from CDC
-. case, positivity, and hospitalization data from NYC
+. TODO: case, positivity, and hospitalization data from NYC
 
 ```{r identify data files}
 
@@ -35,13 +32,27 @@ datafolder <- tk_choose.dir(default = "", caption = "OPEN the folder with source
 files <- dir(datafolder, pattern = "*.csv") # Get a list of csv files in the folder
 
 wastewaterFiles <- files[grepl("sarscov-2_rna_levels", files)]
-# wastewaterFiles <- files[grepl("838", files)]
 
-print("we have the following wastewater data files:")
+print("We have the following wastewater data files:")
 wastewaterFiles
 ```
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file). 
+```{r collect wastewater data}
 
-The preview shows you a rendered HTML copy of the contents of the editor. Consequently, unlike *Knit*, *Preview* does not run any R code chunks. Instead, the output of the chunk when it was last run in the editor is displayed.
+# extract the sewershed ID which is a group of numbers after "sewershed_"
 
+sewershedIDs <- wastewaterFiles %>% 
+  str_match_all(regex("sewershed_(?<ID>[0-9]*)_")) %>%
+   sapply("[[", 2)
+
+```
+
+``` {r read wastewater data}
+
+# First try: get the data from one sewershed
+rawData <- read_csv(file.path(datafolder,wastewaterFiles[1]), col_types = cols(Date = col_date("%m/%d/%y"), Conc = col_double()), skip = 2) %>% `colnames<-`(c("Date", sewershedIDs[1]))
+
+# TODO: Use apply functions to iterate through the file list and make a df for each sewershed
+# TODO: Use suggestion here https://stackoverflow.com/questions/62928897/r-merge-multiple-dataframes-by-date-without-repeating-dates to merge the data to get a single date column and multiple sewersheds 
+# TODO: hide parsing errors because they are not serious so far 
+```
