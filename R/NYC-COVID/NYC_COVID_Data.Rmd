@@ -23,15 +23,16 @@ The Sample Data folder will contain examples of files in the correct format.
 . sewershed data from CDC
 . TODO: case, positivity, and hospitalization data from NYC
 
-```{r identify data files}
+```{r identify wastewater files}
 
 # ---- User chooses the input folder ----
+# LIMITATION: Only wastewater files must be in this folder
 
-datafolder <- tk_choose.dir(default = "", caption = "OPEN the folder with source data") # prompt user
+wastefolder <- tk_choose.dir(default = "", caption = "OPEN the folder with wastewater data ONLY") # prompt user
 
-files <- dir(datafolder, pattern = "*.csv") # Get a list of csv files in the folder
+wastefiles <- dir(wastefolder, pattern = "*.csv") # Get a list of csv files in the folder
 
-wastewaterFiles <- files[grepl("sarscov-2_rna_levels", files)]
+wastewaterFiles <- wastefiles[grepl("sarscov-2_rna_levels", files)]
 
 print("We have the following wastewater data files:")
 wastewaterFiles
@@ -55,7 +56,11 @@ rawDataOne <- read_csv(file.path(datafolder,wastewaterFiles[1]), col_types = col
 # TODO: 
 
 # Second try: Use apply functions to iterate through the file list and make a df for each sewershed
-rawDataAll <- read_csv(file.path(datafolder,wastewaterFiles), col_types = cols(Date = col_date("%m/%d/%y"), Conc = col_double()), skip = 2) %>% `colnames<-`(c("Date", sewershedIDs[1]))
+# rawDataAll <- read_csv(file.path(datafolder,wastewaterFiles), col_types = cols(Date = col_date("%m/%d/%y"), Conc = col_double()), skip = 2) %>% `colnames<-`(c("Date", sewershedIDs[1]))
+
+rawDataAll <- lapply(list.files(wastefolder),full.names=TRUE), read.csv, col_types = cols(Date = col_date("%m/%d/%y"), Conc = col_double()),skip=2)
+
+
 # TODO: Use suggestion here https://stackoverflow.com/questions/62928897/r-merge-multiple-dataframes-by-date-without-repeating-dates to merge the data to get a single date column and multiple sewersheds 
 # TODO: hide parsing errors because they are not serious so far 
 ```
