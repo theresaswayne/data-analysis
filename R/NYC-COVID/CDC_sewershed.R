@@ -16,25 +16,28 @@ require(here) # for file choosing
 # ---- User chooses the input folder ----
 # LIMITATION: Only wastewater files must be in this folder
 
-wastefolder <- tk_choose.dir(default = "", caption = "OPEN the folder with wastewater data ONLY") # prompt user
-wastefiles <- dir(wastefolder, pattern = "*.csv") # Get a list of csv files in the folder
-wastewaterFiles <- wastefiles[grepl("sarscov-2_rna_levels", wastefiles)]
+inputfolder <- tk_choose.dir(default = "", caption = "OPEN the folder with wastewater data ONLY") # prompt user
+inputfiles <- dir(inputfolder, pattern = "*.csv") # Get a list of csv files in the folder
+wastewaterFiles <- inputfiles[grepl("sarscov-2_rna_levels", wastefiles)] # check to get only the appropriate type
 
 print("We have the following wastewater data files:")
-wastewaterFiles
+print (wastewaterFiles)
 
-# extract the sewershed ID which is a group of numbers after "sewershed_"
+# ---- Extract the sewershed ID from the filename ----
+# this is a group of numbers after "sewershed_"
 
 sewershedIDs <- wastewaterFiles %>% 
   str_match_all(regex("sewershed_(?<ID>[0-9]*)_")) %>%
   sapply("[[", 2)
 
+# ---- Extract the dates and concentrations from each file ----
+
 # Proof of principle: get the data from one sewershed
 # Problem: this works, but we want to do it for all of the files automatically
-rawDataOne <- read_csv(file.path(wastefolder,wastewaterFiles[1]), col_types = cols(Date = col_date("%m/%d/%y"), Conc = col_double()), skip = 2) %>% `colnames<-`(c("Date", sewershedIDs[1]))
+rawDataOne <- read_csv(file.path(wastefolder,wastewaterFiles[1]), 
+                       col_types = cols(Date = col_date("%m/%d/%y"), Conc = col_double()), skip = 2) %>% 
+  `colnames<-`(c("Date", sewershedIDs[1]))
 
-# Fail: seems to only do the first one (836)
-# rawDataAll <- read_csv(file.path(wastefolder,wastewaterFiles), col_types = cols(Date = col_date("%m/%d/%y"), Conc = col_double()), skip = 2) %>% `colnames<-`(c("Date", sewershedIDs))
 
 # Try: Use apply functions to iterate through the file list and make a df for each sewershed
 # Problem: We have a list of 2 dfs, each df corresponding to a wastewater file, but we lost the file name info and we want a flat file
