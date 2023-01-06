@@ -25,8 +25,6 @@ need_to_install <- setdiff(faves, existing[,1])
 # checkBuilt parameter added for R 4.0
 update.packages(checkBuilt=TRUE)
 
-
-
 # Install any needed packages
 
 if (length(need_to_install) != 0) {
@@ -47,9 +45,9 @@ if (!("EBImage" %in% existing)) {
   print("Installed EBImage using BiocManager")
   }
 
-if (!("SMoLR" %in% existing)) {
-  install_github("ErasmusOIC/SMoLR", build_vignettes = TRUE)
-  print("Installed SMoLR from GitHub")
-}
+# if (!("SMoLR" %in% existing)) {
+#   install_github("ErasmusOIC/SMoLR", build_vignettes = TRUE)
+#   print("Installed SMoLR from GitHub")
+# }
 
 print("Finished!")
