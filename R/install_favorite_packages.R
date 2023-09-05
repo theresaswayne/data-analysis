@@ -8,7 +8,7 @@ faves <- c("here", # for easy relative paths
            "RColorBrewer", # for nice color palettes
            "swirl",  # for tutorials 
            "tidyverse",
-           "BiocManager", # Bioconductor 
+           # "BiocManager", # Bioconductor 
            "devtools", # needed for Bioconductor and SMoLR
            "manipulateWidget")  # needed for SMoLR
 
