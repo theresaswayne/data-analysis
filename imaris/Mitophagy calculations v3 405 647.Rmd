@@ -1,0 +1,322 @@
+---
+title: "Mitophagy analysis by object overlap"
+output: html_notebook
+---
+
+# Overview
+This notebook calculates the % of volume of Tom20 (mitochondrial marker) that is physically overlapped with LAMP1 (lysosome marker). An increase in mitophagy is predicted to cause an increase in overlap.
+
+To check for changes in abundance of each marker, the total volume per image (field of view) is also calculated.
+
+# Experiment details
+14 images were collected per slide. 
+Images were collected in August and September 2023.
+
+# Analysis details
+Images were batch analyzed in Imaris.
+The source channel is read from the Original Component Name.
+Surfaces 1 is Lamp1 (Far-red channel in this dataset).
+Surfaces 2 is Tom20 (Blue channel in this dataset)
+
+# Input data
+The input files are Imaris batch output tables. Each table is a CSV file containing one type of measurement (such as volume) for many objects within many images. Each observation (row) represents one object (mitochondrion or lysosome), although some may be clumped objects.  
+
+
+```{r}
+# ---- Setup ----
+require(tidyverse) # organizing data
+require(readr) # reading data
+require(stringr) # processing strings
+require(ggplot2)  # plotting
+require(rstudioapi) # selecting output
+```
+
+# Merging data files
+
+Some datasets were processed in two batches. Here, the two datasets are loaded and combined into one. When running this code, select each batch's dataset in turn.
+
+
+First, load the Surfaces 1 (LAMP1, lysosome) Volume and merge into a single dataset
+
+```{r merge batch lyso volume}
+# ---- Prompt for two object volume files ----
+
+lysoVolFile1 <- file.choose()
+lysoVolFile1 # report the file that was selected
+
+# Read the data from the file
+lysoVolData1 <- read_csv(lysoVolFile1,
+                       col_types = cols(...12 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+lysoVolFile2 <- file.choose()
+lysoVolFile2
+
+# Read the data from the file
+lysoVolData2 <- read_csv(lysoVolFile2,
+                       col_types = cols(...12 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+lysoVolData <- rbind(lysoVolData1,lysoVolData2)
+
+```
+
+Next, load the Surfaces 3 (mitochondria) Volume.
+
+```{r merge batch mito volume}
+# ---- Prompt for two object volume files ----
+
+mitoVolFile1 <- file.choose()
+mitoVolFile1 # report the file that was selected
+
+mitoVolData1 <- read_csv(mitoVolFile1,
+                       col_types = cols(...12 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+mitoVolFile2 <- file.choose()
+mitoVolFile2
+
+mitoVolData2 <- read_csv(mitoVolFile2,
+                       col_types = cols(...12 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+mitoVolData <- rbind(mitoVolData1,mitoVolData2)
+
+```
+
+# Calculation of total mitochondrial volume per image  
+
+The Surfaces 3 (Tom20) Volume data is summarized by file name.
+
+```{r calculate total mito volume per image}
+
+mitoVolSums <- mitoVolData %>% 
+  group_by(`Original Image Name`, `Original Image ID`) %>% 
+  summarise(nMitoObjects = n(),
+            SumMitoVolume = sum(Volume))
+mitoVolSums
+```
+# Calculation of total lysosome volume per image  
+
+The Surfaces 1 (LAMP1, lysosome) Volume data is summarized by file name.
+
+```{r calculate total lyso volume per image}
+# ---- Prompt for an object volume file ----
+# no message will be displayed
+
+lysoVolSums <- lysoVolData %>% 
+  group_by(`Original Image Name`,`Original Image ID`) %>% 
+  summarise(nLysoObjects = n(),
+            SumLysoVolume = sum(Volume))
+
+lysoVolSums
+```
+
+# Calculation of total overlap (mito in lyso) volume per image  
+
+The amount of mitochondrial volume that is in lysosomes is tabulated in  "Surfaces_2_Overlapped_Volume_to_Surfaces_Surfaces=Lamp1_647". This data (from the two batches) is loaded, merged, and summarized by file name.
+
+```{r load mito in lyso overlap data}
+
+overlapMLFile1 <- file.choose()
+overlapMLFile1
+
+overlapMLData1 <- read_csv(overlapMLFile1,
+                       col_types = cols(...13 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+overlapMLFile2 <- file.choose()
+overlapMLFile2
+
+overlapMLData2 <- read_csv(overlapMLFile2,
+                       col_types = cols(...13 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+overlapMLData <- rbind(overlapMLData1, overlapMLData2)
+
+overlapMLSums <- overlapMLData %>% 
+  group_by(`Original Image Name`,`Original Image ID`) %>% 
+  summarise(SumMitoInLyso = sum(`Overlapped Volume to Surfaces`))
+
+overlapMLSums
+
+```
+
+
+# Calculation of total overlap (lyso in mito) volume per image  
+
+The amount of lysosome volume that is in mitochondria is tabulated in  "Surfaces_1_Overlapped_Volume_to_Surfaces_Surfaces=Tom20-405". This data is loaded and summarized by file name.
+
+```{r load lyso in mito overlap data}
+
+overlapLMFile1 <- file.choose()
+overlapLMFile1
+
+overlapLMData1 <- read_csv(overlapLMFile1,
+                       col_types = cols(...13 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+overlapLMFile2 <- file.choose()
+overlapLMFile2
+
+overlapLMData2 <- read_csv(overlapLMFile2,
+                       col_types = cols(...13 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+overlapLMData <- rbind(overlapLMData1, overlapLMData2)
+
+overlapLMSums <- overlapLMData %>% 
+  group_by(`Original Image Name`,`Original Image ID`) %>% 
+  summarise(SumLysoInMito = sum(`Overlapped Volume to Surfaces`))
+
+overlapLMSums
+
+```
+# Calculation of fractional overlap per image
+
+The volume and overlap tables are merged by file name.
+
+The date and slide number are extracted from the original file name and path, and the data are summarized by date and blinded slide number, which can be cross-referenced to the unblinded slide information.
+
+```{r merge tables}
+
+mergedVolTable <- inner_join(lysoVolSums, mitoVolSums, by=NULL)
+mergedTable <- inner_join(mergedVolTable, overlapMLSums, by = NULL)
+mergedTable <- inner_join(mergedTable, overlapLMSums, by = NULL)
+
+mergedTable <- mergedTable %>%
+  mutate(FractionOfMitoInLyso = SumMitoInLyso/SumMitoVolume,
+         FractionOfLysoInMito = SumLysoInMito/SumLysoVolume,
+         slideNum = str_sub(`Original Image Name`, 1, 1),
+         imageDate = str_extract(`Original Image ID`, "2023-[0-9]{2}-[0-9]{2}"))
+
+mergedTable
+```
+
+Then the fractional overlap is calculated on a per-image basis (this is different from the Overlap Ratio table produced by Imaris, which is on a per-object basis)
+
+
+```{r}
+summaryTable <- mergedTable %>% 
+  group_by(imageDate, slideNum) %>%
+  summarise(nImages = n(),
+            TotalMito = sum(SumMitoVolume),
+            TotalLyso = sum(SumLysoVolume),
+            TotalMitoInLyso = sum(SumMitoInLyso),
+            TotalLysoInMito = sum(SumLysoInMito)) %>%
+  mutate(WtdAvgMitoInLyso = TotalMitoInLyso/TotalMito,
+         WtdAvgLysoInMito = TotalLysoInMito/TotalLyso)
+
+summaryTable
+```
+
+# Plotting results
+
+Box plots are created for organelle volume and overlap volume.
+Each image is one data point.
+All points are plotted.
+
+## Box-and-whisker plot design
+- A small white square is plotted at the mean.
+- Lower and upper hinges correspond to the first and third quartiles (the 25th and 75th percentiles). 
+- The whiskers extends from the hinge to the most extreme value no further than 1.5 times the IQR from the hinge.
+-- IQR is the inter-quartile range, or distance between the first and third quartiles.
+
+```{r plot overlaps}
+
+# plot overlap fraction of mito in lyso
+
+box_overlapML <- ggplot(mergedTable, 
+                      aes(x=slideNum, y=FractionOfMitoInLyso)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', 
+               stackdir='center', 
+               dotsize = .5, 
+               fill="red") +
+  stat_summary(fun=mean, geom="point", shape=1, size=3) +
+  labs(title = "Mitophagy", subtitle = paste("Images collected starting",mergedTable$imageDate[1])) +
+  xlab("Slide number") +
+  ylab("Fraction of mitochondrial volume in lysosomes")
+
+box_overlapML
+
+box_overlapLM <- ggplot(mergedTable, 
+                      aes(x=slideNum, y=FractionOfLysoInMito)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', 
+               stackdir='center', 
+               dotsize = .5, 
+               fill="red") +
+  stat_summary(fun=mean, geom="point", shape=1, size=3) +
+  labs(title = "Mitophagy", subtitle = paste("Images collected starting",mergedTable$imageDate[1])) +
+  xlab("Slide number") +
+  ylab("Fraction of lysosomal volume in mitochondria")
+
+box_overlapLM
+```
+
+```{r plot volumes}
+box_mito <- ggplot(mergedTable, 
+                      aes(x=slideNum, y=SumMitoVolume)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', 
+               stackdir='center', 
+               dotsize = .5, 
+               fill="red") +
+  stat_summary(fun=mean, geom="point", shape=1, size=3) +
+  labs(title = "Mitochondrial volume", subtitle = paste("Images collected starting",mergedTable$imageDate[1])) +
+  xlab("Slide number") +
+  ylab("Mitochondrial volume per image")
+
+box_mito
+
+
+box_lyso <- ggplot(mergedTable, 
+                      aes(x=slideNum, y=SumLysoVolume)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', 
+               stackdir='center', 
+               dotsize = .5, 
+               fill="red") +
+  stat_summary(fun=mean, geom="point", shape=1, size=3) +
+  labs(title = "Lysosome volume", subtitle = paste("Images collected starting",mergedTable$imageDate[1])) +
+  xlab("Slide number") +
+  ylab("Lysosome volume per image")
+
+box_lyso
+
+```
+
+# Output
+
+The merged table and summary table are saved as CSV files.
+Plots are saved as PDF.
+
+Select an output directory when running this code.
+
+```{r save files}
+
+outputDir <- rstudioapi::selectDirectory(caption = "Select the output directory", label = "Select Folder")
+outputTime <- format(Sys.time(), "%m%e%Y-%H%M%S")
+outputMergedFile = paste(outputTime,"merged.csv")
+outputSummaryFile = paste(outputTime,"summary.csv")
+
+write_csv(mergedCountTable,file.path(outputDir, outputMergedFile))
+write_csv(summaryTable,file.path(outputDir, outputSummaryFile))
+
+ggsave(filename = paste(outputTime, "overlapMitoInLyso.pdf"), plot = box_overlapML, path = outputDir)
+ggsave(filename = paste(outputTime, "overlapLysoInMito.pdf"), plot = box_overlapLM, path = outputDir)
+
+ggsave(filename = paste(outputTime, "mitovolImage.pdf"), plot = box_mito, path = outputDir)
+
+ggsave(filename = paste(outputTime, "lysovolImage.pdf"), plot = box_lyso, path = outputDir)
+
+```
+

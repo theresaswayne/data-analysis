@@ -1,0 +1,315 @@
+---
+title: "Summarizing Overlap Volume from Imaris Statistics"
+output: html_notebook
+---
+
+# Overview
+This notebook calculates total volume overlap of two Surfaces defined in Imaris. It also calculates each surface's total volume and normalizes the volume overlap to each total.
+
+# Experiment details
+ENTER YOUR EXPERMIMENT DETAILS HERE
+Cell type, conditions, stains...
+
+# Analysis details
+ENTER YOUR SURFACE INFO HERE
+Surfaces 1 is ----.
+Surfaces 2 is ----.
+
+```{r setup}
+knitr::opts_chunk$set(
+	message = FALSE,
+	warning = TRUE,
+	include = FALSE
+)
+# ---- Setup ----
+require(tidyverse) # organizing data
+require(readr) # reading data
+require(stringr) # processing strings
+require(ggplot2)  # plotting
+require(rstudioapi) # selecting output
+```
+
+# Input data
+The input files are Imaris single or batch output tables. 
+
+*You will need two Volume tables and one Overlapped Volume to Surfaces table.*
+
+Each table is a CSV file containing one type of measurement (such as volume) for many objects within one or many images. 
+
+Each observation (row) represents one object detected by Imaris. Some may be clumps.  
+
+The channel is read from the Original Component Name column.
+
+# Loading data files
+
+##TODO: Open a folder of files matching a pattern
+
+First, load the Surfaces 1 (S1) Volume data.
+
+```{r load S1 volume, echo=FALSE}
+# ---- Prompt for an object volume file ----
+
+S1VolFile <- file.choose()
+print("Surfaces 1 volume file:")
+S1VolFile # report the file that was selected
+
+# Read the data from the file
+S1VolData <- read_csv(S1VolFile,
+                       col_types = cols(...12 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+```
+
+Next, load the Surfaces 2 (S2) Volume data.
+
+```{r load S2 volume, echo=FALSE}
+# ---- Prompt for an object volume file ----
+
+S2VolFile <- file.choose()
+print("Surfaces 2 volume file:")
+S2VolFile # report the file that was selected
+
+S2VolData <- read_csv(S2VolFile,
+                       col_types = cols(...12 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+```
+# Finally, load one of the Overlap Volume files.
+```{r load S2 in S1 overlap data}
+
+overlapFile <- file.choose()
+overlapFile
+
+overlapMLData <- read_csv(overlapMLFile1,
+                       col_types = cols(...13 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+```
+
+# Calculation of total S1 and S2 volume per image  
+
+The Volume data is summarized by file name.
+
+```{r calculate total S1 and S2 volume per image}
+
+S1VolSums <- S1VolData %>% 
+  group_by(`Original Image Name`,`Original Image ID`) %>% 
+  summarise(nS1Objects = n(),
+            SumS1Volume = sum(Volume))
+
+S2VolSums <- S2VolData %>% 
+  group_by(`Original Image Name`, `Original Image ID`) %>% 
+  summarise(nS2Objects = n(),
+            SumS2Volume = sum(Volume))
+
+```
+
+# Calculation of total overlap (S2 in S1) volume per image  
+
+The overlap volume is stored in the Overlapped Volume to Surfaces column. There are 2 tables that contain this data, one from each Surface, but the numbers are identical because they are simply the volume of the intersection of the two Surfaces.  
+
+```{r sum overlap data}
+
+overlapMLFile1 <- file.choose()
+overlapMLFile1
+
+overlapMLData <- read_csv(overlapMLFile1,
+                       col_types = cols(...13 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+# 
+# overlapMLFile2 <- file.choose()
+# overlapMLFile2
+# 
+# overlapMLData2 <- read_csv(overlapMLFile2,
+#                        col_types = cols(...13 = col_skip()), 
+#                        skip = 3,
+#                        locale = locale())
+# 
+# overlapMLData <- rbind(overlapMLData1, overlapMLData2)
+
+overlapMLSums <- overlapMLData %>% 
+  group_by(`Original Image Name`,`Original Image ID`) %>% 
+  summarise(SumS2InS1 = sum(`Overlapped Volume to Surfaces`))
+
+overlapMLSums
+
+```
+
+
+# Calculation of total overlap (S1 in S2) volume per image  
+
+The amount of S1 volume that is in S2 is tabulated in  "Surfaces_1_Overlapped_Volume_to_Surfaces_Surfaces=Tom20-405". This data is loaded and summarized by file name.
+
+```{r load S1 in S2 overlap data}
+
+overlapLMFile1 <- file.choose()
+overlapLMFile1
+
+overlapLMData <- read_csv(overlapLMFile1,
+                       col_types = cols(...13 = col_skip()), 
+                       skip = 3,
+                       locale = locale())
+
+# overlapLMFile2 <- file.choose()
+# overlapLMFile2
+# 
+# overlapLMData2 <- read_csv(overlapLMFile2,
+#                        col_types = cols(...13 = col_skip()), 
+#                        skip = 3,
+#                        locale = locale())
+# 
+# overlapLMData <- rbind(overlapLMData1, overlapLMData2)
+
+overlapLMSums <- overlapLMData %>% 
+  group_by(`Original Image Name`,`Original Image ID`) %>% 
+  summarise(SumS1InS2 = sum(`Overlapped Volume to Surfaces`))
+
+overlapLMSums
+
+```
+# Calculation of fractional overlap per image
+
+The volume and overlap tables are merged by file name.
+
+The date and slide number are extracted from the original file name and path, and the data are summarized by date and blinded slide number, which can be cross-referenced to the unblinded slide information.
+
+```{r merge tables}
+
+mergedVolTable <- inner_join(S1VolSums, S2VolSums, by=NULL)
+mergedTable <- inner_join(mergedVolTable, overlapMLSums, by = NULL)
+mergedTable <- inner_join(mergedTable, overlapLMSums, by = NULL)
+
+mergedTable <- mergedTable %>%
+  mutate(`Overlap/S2Vol` = SumS2InS1/SumS2Volume,
+         `Overlap/S1Vol` = SumS1InS2/SumS1Volume,
+         slideNum = str_sub(`Original Image Name`, 1, 1),
+         imageDate = str_extract(`Original Image ID`, "2023-[0-9]{2}-[0-9]{2}"))
+
+mergedTable
+```
+
+Then the fractional overlap is calculated on a per-image basis (this is different from the Overlap Ratio table produced by Imaris, which is on a per-object basis)
+
+
+```{r summarise}
+summaryTable <- mergedTable %>% 
+  group_by(imageDate, slideNum) %>%
+  summarise(nImages = n(),
+            TotalS2 = sum(SumS2Volume),
+            TotalS1 = sum(SumS1Volume),
+            TotalS2OverlapWithS1 = sum(SumS2InS1),
+            TotalS1OverlapWithS2 = sum(SumS1InS2)) %>%
+  mutate(`WtdAvg_Overlap/S2Vol` = TotalS2OverlapWithS1/TotalS2,
+         `WtdAvg_Overlap/S1Vol` = TotalS1OverlapWithS2/TotalS1)
+
+summaryTable
+```
+
+# Plotting results
+
+Box plots are created for organelle volume and overlap volume.
+Each image is one data point.
+All points are plotted.
+
+## Box-and-whisker plot design
+- A small white square is plotted at the mean.
+- Lower and upper hinges correspond to the first and third quartiles (the 25th and 75th percentiles). 
+- The whiskers extends from the hinge to the most extreme value no further than 1.5 times the IQR from the hinge.
+-- IQR is the inter-quartile range, or distance between the first and third quartiles.
+
+```{r plot overlaps}
+
+# plot overlap fraction of S2 that is overlapped with S1
+
+box_overlapML <- ggplot(mergedTable, 
+                      aes(x=slideNum, y=`Overlap/S2Vol`)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', 
+               stackdir='center', 
+               dotsize = .5, 
+               fill="red") +
+  stat_summary(fun=mean, geom="point", shape=1, size=3) +
+  labs(title = "S2phagy", subtitle = paste("Images collected starting",mergedTable$imageDate[1])) +
+  xlab("Slide number") +
+  ylab("Overlap volume/S2 volume")
+
+box_overlapML
+
+# plot overlap fraction of S1 that is overlapped with S2
+
+box_overlapLM <- ggplot(mergedTable, 
+                      aes(x=slideNum, y=`Overlap/S1Vol`)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', 
+               stackdir='center', 
+               dotsize = .5, 
+               fill="red") +
+  stat_summary(fun=mean, geom="point", shape=1, size=3) +
+  labs(title = "S2phagy", subtitle = paste("Images collected starting",mergedTable$imageDate[1])) +
+  xlab("Slide number") +
+  ylab("Overlap volume/S1 volume")
+
+box_overlapLM
+```
+
+```{r plot volumes}
+box_S2 <- ggplot(mergedTable, 
+                      aes(x=slideNum, y=SumS2Volume)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', 
+               stackdir='center', 
+               dotsize = .5, 
+               fill="red") +
+  stat_summary(fun=mean, geom="point", shape=1, size=3) +
+  labs(title = "S2 volume", subtitle = paste("Images collected starting",mergedTable$imageDate[1])) +
+  xlab("Slide number") +
+  ylab("S2 volume per image")
+
+box_S2
+
+
+box_S1 <- ggplot(mergedTable, 
+                      aes(x=slideNum, y=SumS1Volume)) + 
+  geom_boxplot() +
+  geom_dotplot(binaxis='y', 
+               stackdir='center', 
+               dotsize = .5, 
+               fill="red") +
+  stat_summary(fun=mean, geom="point", shape=1, size=3) +
+  labs(title = "S1 volume", subtitle = paste("Images collected starting",mergedTable$imageDate[1])) +
+  xlab("Slide number") +
+  ylab("S1 volume per image")
+
+box_S1
+
+```
+
+# Output
+
+The merged table and summary table are saved as CSV files.
+Plots are saved as PDF.
+
+Select an output directory when running this code.
+
+```{r save files}
+
+outputDir <- rstudioapi::selectDirectory(caption = "Select the output directory", label = "Select Folder")
+outputTime <- format(Sys.time(), "%m%e%Y-%H%M%S")
+outputMergedFile = paste(outputTime,"volume merged.csv")
+outputSummaryFile = paste(outputTime,"volume summary.csv")
+
+write_csv(mergedTable,file.path(outputDir, outputMergedFile))
+write_csv(summaryTable,file.path(outputDir, outputSummaryFile))
+
+ggsave(filename = paste(outputTime, "overlap over S2.pdf"), plot = box_overlapML, path = outputDir)
+ggsave(filename = paste(outputTime, "overlap over S1.pdf"), plot = box_overlapLM, path = outputDir)
+
+ggsave(filename = paste(outputTime, "S2volImage.pdf"), plot = box_S2, path = outputDir)
+
+ggsave(filename = paste(outputTime, "S1volImage.pdf"), plot = box_S1, path = outputDir)
+
+```
+
