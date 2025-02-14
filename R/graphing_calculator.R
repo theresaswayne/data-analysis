@@ -1,23 +1,37 @@
 # graphing calculator
 
-# To plot functions without data, specify range of x-axis
+require(ggplot2)
+
+# Plot a function without data (must specify range of x-axis)
+
+f <- function(x) sqrt(x)*10
+g <- function(x) x
+
+xMin <- 0
+xMax <- 100
+
 base <-
   ggplot() +
-  xlim(-20, 20)
+  xlim(xMin, xMax)
 
-f <- function(x) 0.5*exp(-abs(x))
-ben <- function(x) (sqrt(x^2 + x - 12) + 2)
+funGraph <- 
+  base + 
+  geom_function(fun = f) +
+#  geom_function(fun = g) +
+  ggtitle("Function")
 
-mygraph <- base + geom_function(fun = f)
-bengraph <- base + geom_function(fun = ben)
-bengraph2 <- base + stat_function(fun = ben)
+print(funGraph)
 
-print(bengraph)
+# Generate a data table and plot the data from the table
 
-# get a data table
-xvals <- seq(-20, +20, by=0.1)
-yvals <- ben(xvals)
+xvals <- seq(xMin, xMax, by=1)
+yvals <- f(xvals)
 df <- cbind(x=xvals, y=yvals)
 
-datagraph <- base + aes(xvals, yvals) + geom_point(shape=2)
+dataGraph <- 
+  base + 
+  aes(xvals, yvals) + 
+  geom_point(shape=1) +
+  ggtitle("Data")
 
+print(dataGraph)
