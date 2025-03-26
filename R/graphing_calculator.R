@@ -4,11 +4,13 @@ require(ggplot2)
 
 # Plot a function without data (must specify range of x-axis)
 
-f <- function(x) sqrt(x)*10
+#f <- function(x) sqrt(x)*10
+f <- function(x) sqrt(x*(1-x)/1000)
+
 g <- function(x) x
 
 xMin <- 0
-xMax <- 100
+xMax <- 1
 
 base <-
   ggplot() +
