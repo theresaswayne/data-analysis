@@ -1,12 +1,24 @@
-# calculations.R
+# collate_imageJ_results.R
 
-# calculate cytoplasm (cell - nucleus) mean, IntDen, RawIntDen from cells and nuclei measured in ImageJ
+# Theresa Swayne, Columbia University, 2025
+# -------- Suggested text for acknowledgement -----------
+#   "These studies used the Confocal and Specialized Microscopy Shared Resource 
+#   of the Herbert Irving Comprehensive Cancer Center at Columbia University, 
+#   funded in part through the NIH/NCI Cancer Center Support Grant P30CA013696."
+
+# --------- About this script ------------
+# calculates data from an ImageJ results table
+# corrects for background based on an ROI measurement  
+#   and calculates cytoplasm (cell - nucleus) mean, IntDen, RawIntDen 
+#   from cells and nuclei measured in an ImageJ results table
 # Assumptions for input: 
-#   Data is from a single image
+#   Data is from a single 2D image containing one or more cells
+#   ImageJ is set to save Row numbers/Column numbers (Edit > Options > Input/Output)
 #   1st row is background
 #   subsequent rows are nuclei and cell, in order
-#   Only the FUS channel is measured
-
+#   Only the channel of interest is measured
+#   At least Label, Mean, IntDen, RawIntDen, Area are included
+#   (possible future addition: match cell and nucleus based on Centroid coordinates)
 # Output: Each row = 1 cell; intensity data is based on FUS channel (3) 
 # Output columns:
 #   Image name, Cell number, 
@@ -28,32 +40,66 @@ selectedFile <- file.choose()
 # read the file
 data <- read_csv(selectedFile)
 
+# ---- Collect image info ----
+
+# get image name from first row in Label column, 
+#   from beginning to the first colon after a dot and 3 characters (file extension)
+measName <- data$Label[1]
+imageName <- str_match(measName, "^(.*)\\..{3}:")[2] # the second match is the one we want
+
+# get area per pixel, 
+#   by dividing the average IntDen by the average RawIntDen
+areaPerPixel <- mean(data$IntDen)/mean(data$RawIntDen)
+
+# get number of cells,
+#   assuming 2 measurements per cell and 1 row of background
+nCells <- (nrow(data) - 1)/2
+
+# get the background mean, 
+#   from the first data row
+background <- data$Mean[1]
 
 # ---- Organize the data ----
 
-# Gather info about the image and data table  
-#   get image name from Label column
-#   get number of cells by dividing (nrows-1)/2
-#   get area per pixel by dividing the avg ID by the avg RawID (confirm!)
+# rename dummy "...1" column (ImageJ does not provide a header)
+data <- rename(data, "Measurement" = `...1`)
 
-# Collect the background mean from the first data row
-background <- data$Mean[1]
+# sort by column 1 just to make sure we're in order (*may be unnecessary?)
+data <- arrange(data, `...1`)
 
-# Sort by column 1 just to make sure we're in order
+# collect nuclei data
+#   collect the nuclei rows: 2, 4, 6, ...
+nuclei_rows <- seq(2, nrow(data), by=2)
+nuclei_data <- data[nuclei_rows,]
 
-# Assuming 'df' is your data frame
-# df[seq(2, nrow(df), by = 2), ] # Selects even-numbered rows (2nd, 4th, etc.)
-# df[seq(1, nrow(df), by = 2), ] # Selects odd-numbered rows (1st, 3rd, etc.)
+#   add a cell number column to nuclei data
+nuclei_data <- mutate(nuclei_data, CellNumber=Measurement/2, .before = Measurement)
 
-# Collect the nuclei rows: 2, 4, 6, ...
-# add a cell number column
-# rename data columns Nuc_Mean, etc
+#   rename all subsequent data columns
+nuclei_renamed <- rename_with(nuclei_data, 
+                              ~ paste0("Nuc_", .x),
+                                      any_of(c("Measurement", "Label", "Area", 
+                                               "Mean", "X", "Y", 
+                                               "IntDen", "RawIntDen")))
 
-# Collect the cell rows: 3, 5, 7...
-# add a cell number column
-# rename data columns Cell_Mean, etc
+# collect cell data
+#   collect the cell rows: 3, 5, 7...
+cells_rows <- seq(3, nrow(data), by=2)
+cells_data <- data[cells_rows,]
+
+#   add a cell number column to nuclei data
+cells_data <- mutate(cells_data, CellNumber=(Measurement-1)/2, .before = Measurement)
+
+#   rename all subsequent data columns
+cells_renamed <- rename_with(cells_data, 
+                              ~ paste0("Cell_", .x),
+                              any_of(c("Measurement", "Label", "Area", 
+                                       "Mean", "X", "Y", 
+                                       "IntDen", "RawIntDen")))
+
 
 # Merge the nuclei and cell data by the cell number, and sort by cell number
+data_merged <- full_join(nuclei_renamed, cells_renamed, by=join_by(CellNumber))
 
 # ---- Calculate results ----
 
