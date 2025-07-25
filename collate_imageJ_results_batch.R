@@ -29,6 +29,7 @@
 
 require(tidyverse) # for data processing
 require(stringr) # for string harvesting
+require(tools) # for file name processing
 
 # ---- Input and output setup ----
 
@@ -36,18 +37,13 @@ require(stringr) # for string harvesting
 selectedFile <- file.choose()
 inputFolder <- dirname(selectedFile) # the input is the parent of the selected file
 
-# Create an output folder
-dir.create(file.path(inputFolder,"Calculations")) # within the input folder
-outputFolder <- file.path(inputFolder,"Calculations")
+# Create an output folder with time-date stamp
+
+thisTime = format(Sys.time(),"%Y-%m-%d_%H%M")
+outputFolder <- file.path(inputFolder,paste0("Output_",thisTime))
+dir.create(outputFolder) # creates within the input folder if it does not already exist
 
 # Get names of CSV files in the folder
-
-# get file names
-#files <- dir(inputFolder, pattern = paste("*",finalText,sep=""))
-
-#files <- tibble(file = list.files(path       = inputFolder, 
-                                  # pattern    = '\\.csv', 
-                                  # full.names = TRUE))
 
 files <- list.files(inputFolder, pattern = "*.csv")
 
