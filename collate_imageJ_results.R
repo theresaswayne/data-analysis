@@ -11,23 +11,19 @@
 # corrects for background based on an ROI measurement  
 #   and calculates cytoplasm (cell - nucleus) mean, IntDen, RawIntDen 
 #   from cells and nuclei measured in an ImageJ results table
-# Assumptions for input: 
+# Important Assumptions for Input! 
 #   Data is from a single 2D image containing one or more cells
+#   At least Label, Mean, IntDen, RawIntDen, Area are included
 #   ImageJ is set to save Row numbers/Column numbers (Edit > Options > Input/Output)
-#   1st row is background
+#   1st row is background measurement
 #   subsequent rows are nuclei and cell, in order
 #   Only the channel of interest is measured
-#   At least Label, Mean, IntDen, RawIntDen, Area are included
-#   (possible future addition: match cell and nucleus based on Centroid coordinates)
-# Output: Each row = 1 cell; intensity data is based on FUS channel (3) 
-# Output columns:
-#   Image name, Cell number, 
-#   Nucleus area, Nucleus mean, Nucleus IntDen, Nucleus RawIntden
-#   Cell area/mean/intden/rawintden
-#   Cytoplasm area/mean/intden/rawintden
-#   Background-corrected mean, intden, rawintden for each compartment
-#   cytoplasm/nucleus ratio (background corrected) for mean, intden, rawintden
-#   cytoplasm/cell ratio (background corrected) for mean, intden, rawintden
+# Output: Each row = 1 cell 
+# Output data: original data plus:
+#   Background-corrected mean, intden, rawintden for nucleus and cell
+#   Cytoplasm area and Background-corrected mean/intden/rawintden
+#   Cytoplasm/nucleus ratio (background corrected) for mean, intden
+#   Cytoplasm/cell ratio (background corrected) for mean, intden
 
 # ---- Setup and load data ----
 
