@@ -65,7 +65,7 @@ background <- data$Mean[1]
 data <- rename(data, "Measurement" = `...1`)
 
 # sort by column 1 just to make sure we're in order (*may be unnecessary?)
-data <- arrange(data, `...1`)
+data <- arrange(data, Measurement)
 
 # collect nuclei data
 #   collect the nuclei rows: 2, 4, 6, ...
@@ -106,17 +106,29 @@ data_merged <- full_join(nuclei_renamed, cells_renamed, by=join_by(CellNumber))
 # Do background correction on nuclei and cells
 
 #   For Mean, subtract background value
-#   For IntDens, subtract background * area (um2)
-#   For RawIntDens, calculate area (pixels) = rawID/ID * area; then subtract background * area (pixels)
+data_corrected <- data_merged %>% 
+  mutate(Nuc_Corr_Mean = Nuc_Mean-background, .after=Nuc_Mean) %>%
+  mutate(Cell_Corr_Mean = Cell_Mean-background, .after=Cell_Mean) 
 
-#   Output cols Corr_Nuc_Mean, etc
+#   For IntDens, subtract background * area (um2)
+data_corrected <- data_corrected %>% 
+  mutate(Nuc_Corr_IntDen = Nuc_IntDen-(background*Nuc_Area), .after=Nuc_IntDen) %>%
+  mutate(Cell_Corr_IntDen = Cell_IntDen-(background*Cell_Area), .after=Cell_IntDen)
+
+#   For RawIntDens, subtract background * #pixels, where #pixels = area(um2)/area per pixel
+data_corrected <- data_corrected %>% 
+  mutate(Nuc_Corr_RawIntDen = Nuc_RawIntDen-(background*Nuc_Area/areaPerPixel), .after=Nuc_RawIntDen) %>%
+  mutate(Cell_Corr_RawIntDen = Cell_RawIntDen-(background*Cell_Area/areaPerPixel), .after=Cell_RawIntDen)
 
 # Calculate cytoplasm data
-  # Cyto_Area_um = Cell_Area - Nuc_Area (um)
-  # Cyto_Area_Pixels = Cyto_Area_um * area_per_pixel
-  # Corr_Cyto_RawIntDen = Corr_Cell_RawIntDen - Corr_Nuc_RawIntDen
-  # Corr_Cyto_IntDen = Corr_Cyto_RawIntDen * area_per_pixel
-  # Corr_Cyto_Mean = Corr_Cyto_IntDen/Cyto_Area_um (confirm as Corr_Cyto_RawIntDen/Cyto_Area_Pixels)
+
+data_calculated <- data_corrected %>%
+  mutate(Cyto_Area = Cell_Area - Nuc_Area, .after=Cell_Corr_RawIntDen) %>%
+  mutate(Cyto_Corr_RawIntDen = Cell_RawIntDen - Nuc_Corr_RawIntDen, .after=Cyto_Area)
+
+data_calculated <- data_calculated %>%
+  mutate(Cyto_Corr_IntDen = Cyto_Corr_RawIntDen * areaPerPixel, .before = Cyto_Corr_RawIntDen) %>%
+  mutate(Cyto_Corr_Mean = Cyto_Corr_IntDen/Cyto_Area, .after = Cyto_Area)
 
 # Calculate ratios
 #   cytoplasm/nucleus ratio (background corrected) for mean, intden, rawintden
@@ -124,10 +136,16 @@ data_merged <- full_join(nuclei_renamed, cells_renamed, by=join_by(CellNumber))
 # Corr_Cyto/Nuc_Mean,etc
 # Corr_Cyto/Cell_Mean, etc
 
-# ---- Output results ----
+data_ratios <- data_calculated %>% 
+  mutate(Ratio_CytoNuc_Corr_Mean = Cyto_Corr_Mean/Nuc_Corr_Mean) %>%
+  mutate(Ratio_CytoNuc_Corr_IntDen = Cyto_Corr_IntDen/Nuc_Corr_IntDen) %>%
+  mutate(Ratio_CytoCell_Corr_Mean = Cyto_Corr_Mean/Cell_Corr_Mean) %>%
+  mutate(Ratio_CytoCell_Corr_IntDen = Cyto_Corr_IntDen/Cell_Corr_IntDen)
+
+# ---- Save results ----
 
 outputFolder <- dirname(selectedFile) # parent of the input folder
 # generate filename from image name
-# outputFile = paste(basename(inputFolder), " merged", finalText, sep = "")
+outputName = paste(imageName,"_calculations.csv", sep = "")
 # write CSV file
-# write_csv(mergedDataFlat,file.path(outputFolder, outputFile))
+write_csv(data_ratios,file.path(outputFolder, outputName))
