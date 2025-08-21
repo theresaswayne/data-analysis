@@ -7,18 +7,18 @@
 #   funded in part through the NIH/NCI Cancer Center Support Grant P30CA013696."
 
 # --------- About this script ------------
-# calculates data from an ImageJ results table
+# calculates data for a folder of ImageJ results tables
 # corrects for background based on an ROI measurement  
 #   and calculates cytoplasm (cell - nucleus) mean, IntDen, RawIntDen 
 #   from cells and nuclei measured in an ImageJ results table
 # Important Assumptions for Input! 
-#   Data is from a single 2D image containing one or more cells
+#   Each spreadsheet is from a single 2D image containing one or more cells
 #   At least Label, Mean, IntDen, RawIntDen, Area are included
 #   ImageJ is set to save Row numbers/Column numbers (Edit > Options > Input/Output)
 #   1st row is background measurement
 #   subsequent rows are nuclei and cell, in order
 #   Only the channel of interest is measured
-# Output: Each row = 1 cell 
+# Output: Set of CSV files, each file = 1 image; each row = 1 cell 
 # Output data: original data plus:
 #   Background-corrected mean, intden, rawintden for nucleus and cell
 #   Cytoplasm area and Background-corrected mean/intden/rawintden
