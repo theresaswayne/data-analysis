@@ -52,7 +52,13 @@ files <- list.files(inputFolder, pattern = "*.csv")
 process_file_func <- function(f, out) {
   
   # read the file
-  data <- read_csv(file.path(inputFolder, f))
+  data <- read_csv(file.path(inputFolder, f), show_col_types = FALSE)
+  
+  # check for missing/extra data by counting rows
+  if (nrow(data)%%2 == 0) {
+    print(paste0(file, " has the wrong number of rows"))
+    return()
+  }
   
   # ---- Collect image info ----
   
