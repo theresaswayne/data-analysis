@@ -50,18 +50,46 @@ confocal_superres <- filter(df_filt, grepl("Red|Yellow|Orange|Aqua|Green|Blue", 
 intravital <- filter(df_filt, grepl("Black", `Charge Name`))
 plate <- filter(df_filt, grepl("Cytation",`Charge Name`))
 training <- filter(df_filt, grepl("Training", `Usage Type`))
+consults <- filter(df_filt, grepl("Consultation", `Usage Type`))
 
 # Summarize each type of usage by lab
-conf_sr_summ <- confocal_superres %>% group_by(LabFull) %>% summarize(ConfHours = sum(Quantity), ConfSessions = n())
-intrav_summ <- intravital %>% group_by(LabFull) %>% summarize(IntravitalHours = sum(Quantity), IntravitalSessions = n())
-plate_summ <- longterm %>% group_by(LabFull) %>% summarize(PlateHours = sum(Quantity), PlateSessions = n())
-train_summ <- training %>% group_by(LabFull) %>% summarize(TrainingHours = sum(Quantity), TrainingSessions = n())
+conf_sr_summ <- confocal_superres %>% 
+  group_by(LabFull) %>% 
+  summarize(LabLast = unique(LabLast),
+            LabFirst = unique(LabFirst),
+            ConfHours = sum(Quantity),
+            ConfSessions = n())
+intrav_summ <- intravital %>% 
+  group_by(LabFull) %>% 
+  summarize(LabLast = unique(LabLast), LabFirst = unique(LabFirst),
+            IntravitalHours = sum(Quantity), IntravitalSessions = n())
+plate_summ <- plate %>%
+  group_by(LabFull) %>%
+  summarize(LabLast = unique(LabLast), LabFirst = unique(LabFirst),
+            PlateHours = sum(Quantity), PlateSessions = n())
+train_summ <- training %>% 
+  group_by(LabFull) %>% 
+  summarize(LabLast = unique(LabLast), LabFirst = unique(LabFirst),
+            TrainingHours = sum(Quantity), TrainingSessions = n())
+consult_summ <- consults %>%
+  group_by(LabFull) %>%
+  summarize(LabLast = unique(LabLast), LabFirst = unique(LabFirst),
+            ConsultHours = sum(Quantity), ConsultSessions = n())
+all_summ <- df_filt %>% 
+  group_by(LabFull) %>% 
+  summarize(LabLast = unique(LabLast), LabFirst = unique(LabFirst),
+            TotalHours = sum(Quantity), TotalSessions = n())
 
 # merge all the summaries
 merged_summ <- full_join(conf_sr_summ, intrav_summ)
 merged_summ <- full_join(merged_summ, plate_summ)
 merged_summ <- full_join(merged_summ, train_summ)
+merged_summ <- full_join(merged_summ, consult_summ)
+merged_summ <- full_join(merged_summ, all_summ)
+
+# sort by lab last name
+merged_summ <- arrange(merged_summ, LabLast, LabFirst)
 
 # save csv
-year <- "2022-23"
+year <- "2025-26"
 write_csv(merged_summ, paste(year, "dldrc summary.csv"))
