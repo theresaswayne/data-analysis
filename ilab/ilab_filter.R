@@ -16,6 +16,8 @@ dldrc <- dldrc %>% mutate(MergedFull=mergedNames)
 # read in iLab source data as "df"
 # this is for a year of usage
 
+df <- df2526
+
 # parse the Customer Lab column using comma
 splitNames <- str_split(df$`Customer Lab`, ",")
 
@@ -51,6 +53,7 @@ intravital <- filter(df_filt, grepl("Black", `Charge Name`))
 plate <- filter(df_filt, grepl("Cytation",`Charge Name`))
 training <- filter(df_filt, grepl("Training", `Usage Type`))
 consults <- filter(df_filt, grepl("Consultation", `Usage Type`))
+analysis <- filter(df_filt, grepl("Analysis", `Usage Type`))
 
 # Summarize each type of usage by lab
 conf_sr_summ <- confocal_superres %>% 
@@ -75,6 +78,10 @@ consult_summ <- consults %>%
   group_by(LabFull) %>%
   summarize(LabLast = unique(LabLast), LabFirst = unique(LabFirst),
             ConsultHours = sum(Quantity), ConsultSessions = n())
+analysis_summ <- analysis %>%
+  group_by(LabFull) %>%
+  summarize(LabLast = unique(LabLast), LabFirst = unique(LabFirst),
+            AnalysisHours = sum(Quantity), AnalysisSessions = n())
 all_summ <- df_filt %>% 
   group_by(LabFull) %>% 
   summarize(LabLast = unique(LabLast), LabFirst = unique(LabFirst),
@@ -85,6 +92,7 @@ merged_summ <- full_join(conf_sr_summ, intrav_summ)
 merged_summ <- full_join(merged_summ, plate_summ)
 merged_summ <- full_join(merged_summ, train_summ)
 merged_summ <- full_join(merged_summ, consult_summ)
+merged_summ <- full_join(merged_summ, analysis_summ)
 merged_summ <- full_join(merged_summ, all_summ)
 
 # sort by lab last name
